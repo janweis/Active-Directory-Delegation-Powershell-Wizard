@@ -1,4 +1,4 @@
-﻿#requires -Version 3.0
+#requires -Version 3.0
 #requires -modules ActiveDirectory
 
 #
@@ -117,7 +117,9 @@ function Invoke-ADDelegationTemplate {
             }
         }
 
+        #
         # GUIDs for objects
+        #
         $userObjectGUID = 'bf967aba-0de6-11d0-a285-00aa003049e2'
         $groupObjectGUID = 'bf967a9c-0de6-11d0-a285-00aa003049e2'
         $computerObjectGUID = 'bf967a86-0de6-11d0-a285-00aa003049e2'
@@ -127,35 +129,45 @@ function Invoke-ADDelegationTemplate {
         $gpLinkObjectGUID = 'f30e3bbe-9ff0-11d1-b603-0000f80367c1'
         $gpOptionsObjectGUID = 'f30e3bbf-9ff0-11d1-b603-0000f80367c1'
 
+        #
         # GUIDs for control rights
+        #
         $resetPasswordGUID = '00299570-246d-11d0-a768-00aa006e0529'
         $changePasswordGUID = 'ab721a53-1e2f-11d0-9819-00aa0040529b'
         $rsopPlanningGUID = 'b7b1b3dd-ab09-4242-9e30-9980e5d322f7'
         $rsopLoggingGUID = 'b7b1b3de-ab09-4242-9e30-9980e5d322f7'
 
+        #
         # GUIDs for properties
-        $sAMAccountNamePropertyGUID = '3e0abfd0-126a-11d0-a060-00aa006c33ed'
-        $userPrincipalNamePropertyGUID = '28630ebb-41d5-11d1-a9c1-0000f80367c1'
-        $namePropertyGUID = 'bf967a0e-0de6-11d0-a285-00aa003049e2'
+        #
+        ## COMMON properties
         $cnPropertyGUID = 'bf96793f-0de6-11d0-a285-00aa003049e2'
+        $namePropertyGUID = 'bf967a0e-0de6-11d0-a285-00aa003049e2'
         $displayNamePropertyGUID = 'bf967953-0de6-11d0-a285-00aa003049e2'
-        $memberPropertyGUID = 'bf9679c0-0de6-11d0-a285-00aa003049e2'
+        $sAMAccountNamePropertyGUID = '3e0abfd0-126a-11d0-a060-00aa006c33ed'
         $userAccountControlPropertyGUID = 'bf967a68-0de6-11d0-a285-00aa003049e2'
         $descriptionPropertyGUID = 'bf967950-0de6-11d0-a285-00aa003049e2'
         $infoPropertyGUID = 'bf96793e-0de6-11d0-a285-00aa003049e2'
-        $accountExpiresPropertyGUID = 'bf967915-0de6-11d0-a285-00aa003049e2'
         $managedByPropertyGUID = '0296c120-40da-11d1-a9c0-0000f80367c1'
-        $ouPropertyGUID = 'bf967aa5-0de6-11d0-a285-00aa003049e2'
-        $lockoutTimePropertyGUID = '28630ebf-41d5-11d1-a9c1-0000f80367c1'
-        $pwdLastSetPropertyGUID = 'bf967a0a-0de6-11d0-a285-00aa003049e2'
-        $groupTypePropertyGUID = '9a9a021e-4a5b-11d1-a9c3-0000f80367c1'
-        $physicalDeliveryOfficeNamePropertyGUID = 'bf9679f7-0de6-11d0-a285-00aa003049e2'
         $telephoneNumberPropertyGUID = 'bf967a49-0de6-11d0-a285-00aa003049e2'
         $wWWHomePagePropertyGUID = 'bf967a7a-0de6-11d0-a285-00aa003049e2'
+        
+        ## USER properties
+        $userPrincipalNamePropertyGUID = '28630ebb-41d5-11d1-a9c1-0000f80367c1'
+        $accountExpiresPropertyGUID = 'bf967915-0de6-11d0-a285-00aa003049e2'
+        $lockoutTimePropertyGUID = '28630ebf-41d5-11d1-a9c1-0000f80367c1'
+        $pwdLastSetPropertyGUID = 'bf967a0a-0de6-11d0-a285-00aa003049e2'
+        $physicalDeliveryOfficeNamePropertyGUID = 'bf9679f7-0de6-11d0-a285-00aa003049e2'
         $logonHoursPropertyGUID = 'bf9679ab-0de6-11d0-a285-00aa003049e2'
         $userWorkstationsPropertyGUID = 'bf9679d7-0de6-11d0-a285-00aa003049e2'
         $profilePathPropertyGUID = 'bf967a05-0de6-11d0-a285-00aa003049e2'
         $scriptPathPropertyGUID = 'bf9679a8-0de6-11d0-a285-00aa003049e2'
+        $ouPropertyGUID = 'bf9679f0-0de6-11d0-a285-00aa003049e2'
+        
+        ## GROUP properties
+        $memberPropertyGUID = 'bf9679c0-0de6-11d0-a285-00aa003049e2'
+        $groupTypePropertyGUID = '9a9a021e-4a5b-11d1-a9c3-0000f80367c1'
+        
 
         # Template configurations
         $templates = @(
@@ -747,7 +759,7 @@ function Invoke-ADDelegationTemplate {
             $selectedTemplate = $templates | Where-Object { $_.ID -eq $TemplateID }
 
             # Grant Permissions
-            Grant-AdPermission -OrganizationalUnitDN $DelegationOuDN -ADGroupName $AdIdentity -Rights $selectedTemplate.Rights `
+            Grant-AdPermission -OrganizationalUnitDN $DelegationOuDN -Identity $AdIdentity -Rights $selectedTemplate.Rights `
                 -ObjectTypeGUID $selectedTemplate.ObjectTypeGUID -ControlRight $selectedTemplate.ControlRight -PropertyGUID $selectedTemplate.PropertyGUID
 
             Write-Host -Object '[*] All permissions applied successfully.' -ForegroundColor Green
