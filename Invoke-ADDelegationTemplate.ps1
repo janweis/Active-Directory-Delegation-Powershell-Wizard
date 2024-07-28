@@ -41,13 +41,38 @@ function Invoke-ADDelegationTemplate {
         [Parameter(Mandatory, ParameterSetName = "DoTheMagic")]
         [int]$TemplateID,
 
-        [Parameter(Mandatory, ParameterSetName = "Viewer")]
-        [switch]$ShowTemplates
+        [Parameter(ParameterSetName = "DoTheMagic")]
+        [switch]$LogChanges,
+
+        [Parameter(ParameterSetName = "DoTheMagic")]
+        [string]$LogPath,
+
+        [Parameter(ParameterSetName = "Viewer")]
+        [switch]$ShowTemplates,
+
+        [Parameter(ParameterSetName = "Viewer")]
+        [switch]$ShowUserTemplates,
+
+        [Parameter(ParameterSetName = "Viewer")]
+        [switch]$ShowComputerTemplates,
+
+        [Parameter(ParameterSetName = "Viewer")]
+        [switch]$ShowGroupTemplates,
+
+        [Parameter(ParameterSetName = "Viewer")]
+        [switch]$ShowOUTemplates,
+
+        [Parameter(ParameterSetName = "Viewer")]
+        [switch]$ShowGPOTemplates,
+
+        [Parameter(ParameterSetName = "Viewer")]
+        [switch]$ShowWmiTemplates
     )
     
     begin {
         Write-Verbose -Message "[Invoke-ADDelegationTemplate] START"
 
+        # Grant permissions to the AD object
         function Grant-AdPermission {
             param (
                 [Parameter(Mandatory)]
@@ -96,26 +121,69 @@ function Invoke-ADDelegationTemplate {
 
             $adObject.ObjectSecurity.AddAccessRule($ace)    
             $adObject.CommitChanges()
-            Write-Verbose -Message "[*] Applied permission: Rights = $Rights, Object Type GUID = $ObjectTypeGUID, Control Right = $ControlRight, Property GUID = $PropertyGUID to OU = $OrganizationalUnitDN for Group = $ADGroupDN"
+            Write-Verbose -Message "[*] Applied permission:`n`tRights = $Rights`n`t => Object Type GUID = $ObjectTypeGUID,`n`t => Control Right = $ControlRight,`n`t => Property GUID = $PropertyGUID `n`tOU = $OrganizationalUnitDN `n`tADIdentity = $Identity"
         }
 
-        function Select-Template {
-            param (
-                [Parameter(Mandatory)]
-                [array]$Templates,
 
-                [Parameter(Mandatory)]
-                [int]$TemplateID
-            )
-
-            return $Templates[$TemplateID - 1]
-        }
-
+        # Show all templates
         function Show-Templates() {
             for ($i = 0; $i -lt $templates.Count; $i++) {
                 Write-Host -Object "$($templates[$i].Description)"
             }
         }
+
+
+        # Show a list of templates of a selected category
+        function Show-TemplateCategory([int]$CategoryStart = 0) {
+
+            [decimal]$nextHundred = [math]::Ceiling(($CategoryStart + 1) / 100) * 100
+            $categorieTemplates = $templates | Where-Object {($_.ID -ge $CategoryStart) -and ($_.ID -lt $nextHundred)}
+
+            for ($i = 0; $i -lt $categorieTemplates.Count; $i++) {
+                Write-Host -Object "$($categorieTemplates[$i].Description)"
+            }
+        }
+
+
+        # Writes a Logging for Changes, to revert Changes easyly
+        function Write-PermissionChangesToLog {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory)]
+                [string]$LogFilePath,
+
+                [Parameter(Mandatory)]
+                [string]$TemplateID,
+
+                [Parameter(Mandatory)]
+                [string]$OuDN,
+
+                [Parameter(Mandatory)]
+                [string]$Identity,
+
+                [Parameter(Mandatory)]
+                [System.DirectoryServices.ActiveDirectoryRights]$Rights,
+
+                [string]$ObjectTypeGUID = $null,
+                [string]$ControlRight = $null,
+                [string]$PropertyGUID = $null
+            )
+
+            $currentDate = (Get-Date).ToShortDateString()
+            $currentTime = (Get-Date).ToShortTimeString()
+            $stringRights = $Rights.ToString()
+
+            # Datum, Uhrzeit, TemplateID, OU, Identity, Permisson, ObjectType, Property, ControlRight
+            $fileData = "$currentDate;$currentTime;$TemplateID;$OuDN;$Identity;$stringRights;$ObjectTypeGUID;$PropertyGUID;$ControlRight"
+
+            try {
+                Out-File -FilePath $LogFilePath -InputObject $fileData -Encoding utf8 -Append -NoClobber | Out-Null
+            }
+            catch {
+                Write-Error -Message "[Err] Could not write Log for permission changes! $_"
+            }
+        }
+
 
         #
         # GUIDs for objects
@@ -178,8 +246,6 @@ function Invoke-ADDelegationTemplate {
             @{
                 ID          = 100
                 Description = "`n --- User Account Templates ---"
-                #Rights         = [System.DirectoryServices.ActiveDirectoryRights]::GenericAll
-                #ObjectTypeGUID = $userObjectGUID
             }, 
             @{
                 ID             = 101
@@ -422,8 +488,6 @@ function Invoke-ADDelegationTemplate {
             @{
                 ID          = 200
                 Description = "`n --- Group Account Templates ---"
-                #Rights         = [System.DirectoryServices.ActiveDirectoryRights]::GenericAll
-                #ObjectTypeGUID = $groupObjectGUID
             },
             @{
                 ID             = 201
@@ -528,8 +592,6 @@ function Invoke-ADDelegationTemplate {
             @{
                 ID          = 300
                 Description = "`n --- Computer Account Templates ---"
-                #Rights         = [System.DirectoryServices.ActiveDirectoryRights]::CreateChild
-                #ObjectTypeGUID = $computerObjectGUID
             }, 
             @{
                 ID             = 301
@@ -605,8 +667,6 @@ function Invoke-ADDelegationTemplate {
             @{
                 ID          = 400
                 Description = "`n --- Organizational Unit Templates ---"
-                #Rights         = [System.DirectoryServices.ActiveDirectoryRights]::CreateChild
-                #ObjectTypeGUID = $ouObjectGUID
             }, 
             @{
                 ID             = 401
@@ -669,8 +729,6 @@ function Invoke-ADDelegationTemplate {
             @{
                 ID          = 500
                 Description = "`n --- inetOrgPerson Templates ---"
-                #Rights         = [System.DirectoryServices.ActiveDirectoryRights]::GenericAll
-                #ObjectTypeGUID = $inetOrgPersonObjectGUID
             },
             @{
                 ID             = 501
@@ -699,8 +757,6 @@ function Invoke-ADDelegationTemplate {
             @{
                 ID          = 600
                 Description = "`n --- Group Policy Templates ---"
-                #Rights         = [System.DirectoryServices.ActiveDirectoryRights]::WriteProperty
-                #ObjectTypeGUID = $gpLinkObjectGUID
             }, 
             @{
                 ID             = 601
@@ -735,8 +791,6 @@ function Invoke-ADDelegationTemplate {
             @{
                 ID          = 700
                 Description = "`n --- WMI Filter Templates ---"
-                #Rights         = [System.DirectoryServices.ActiveDirectoryRights]::GenericAll
-                #ObjectTypeGUID = $wmiFilterObjectGUID
             }
             @{
                 ID             = 701
@@ -749,25 +803,54 @@ function Invoke-ADDelegationTemplate {
     
     process {
 
-        if ($ShowTemplates) {
-            Show-Templates
+        # Templates
+        if ($PSCmdlet.ParameterSetName -like 'Viewer') {
+            if ($ShowTemplates)         { Show-Templates; continue }
+            if ($ShowUserTemplates)     { Show-TemplateCategory -CategoryStart 100 }
+            if ($ShowComputerTemplates) { Show-TemplateCategory -CategoryStart 200 }
+            if ($ShowGroupTemplates)    { Show-TemplateCategory -CategoryStart 300 }
+            if ($ShowOUTemplates)       { Show-TemplateCategory -CategoryStart 400 }
+            if ($ShowGPOTemplates)      { Show-TemplateCategory -CategoryStart 600 }
+            if ($ShowWmiTemplates)      { Show-TemplateCategory -CategoryStart 700 }
+
             continue
         }
 
+        # Parameter validation
+        if($LogChanges) {
+            if(-not $LogPath) {
+                Write-Error -Message "[err] No valid LogPath-Param found!"
+                continue
+            }
+        }
+
+
+        # MAIN
         try {
-            # Select and apply selectedTemplate
             $selectedTemplate = $templates | Where-Object { $_.ID -eq $TemplateID }
 
-            # Grant Permissions
-            Grant-AdPermission -OrganizationalUnitDN $DelegationOuDN -Identity $AdIdentity -Rights $selectedTemplate.Rights `
-                -ObjectTypeGUID $selectedTemplate.ObjectTypeGUID -ControlRight $selectedTemplate.ControlRight -PropertyGUID $selectedTemplate.PropertyGUID
+            # Apply multiple Permissions if present and needed
+            Foreach ($templateItem in $selectedTemplate) {
 
-            Write-Host -Object '[*] All permissions applied successfully.' -ForegroundColor Green
+                Grant-AdPermission -OrganizationalUnitDN $DelegationOuDN -Identity $AdIdentity -Rights $templateItem.Rights `
+                    -ObjectTypeGUID $templateItem.ObjectTypeGUID -ControlRight $templateItem.ControlRight -PropertyGUID $templateItem.PropertyGUID
 
+                if ($LogChanges) {
+                    if ($null -eq $LogPath) {
+                        Write-Error -Message "[err] No LogPath found. Please Enter a valid -LogPath"
+                    }
+                    else {
+                        Write-PermissionChangesToLog -LogFilePath $LogPath -TemplateID $TemplateID -OuDN $DelegationOuDN -Identity $AdIdentity -Rights $templateItem.Rights `
+                            -ObjectTypeGUID $templateItem.ObjectTypeGUID -ControlRight $templateItem.ControlRight -PropertyGUID $templateItem.PropertyGUID
+                    }
+                }
+
+                Write-Verbose -Message "[info] Template $TemplateID applied successfully."
+            }
         }
         catch {
             # Error
-            Write-Host -Object "[E] Could not apply permissions! $_" -ForegroundColor Red
+            Write-Host -Object "[err] Could not apply permissions! $_" -ForegroundColor Red
         }
     }
     
