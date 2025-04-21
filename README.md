@@ -1,16 +1,71 @@
-# Active Directory Delegation Powershell-Wizard
-This PowerShell script is used to assign permissions in Active Directory based on predefined templates.  It enables administrators to configure specific rights and properties for user, group, computer and OU objects in Active Directory.
+# 🧰 Active Directory Delegation PowerShell Wizard
 
-## Features
-* Log and Revert changes made
-* Easy to extend
+A PowerShell script to automate delegation of permissions in Active Directory — based on predefined templates.
 
-## Show Templates (Examples)
+## 🔍 Purpose
 
-**Show** all templates
-```Powershell
+This script helps administrators assign permissions in Active Directory in a consistent, transparent, and repeatable way — without relying on the graphical Delegation Wizard.
+
+Delegation is applied based on predefined templates for various object types such as users, groups, computers, organizational units, Group Policy Objects (GPOs), and more.
+
+---
+
+## 🧾 Requirements
+
+- PowerShell version 3.0 or higher
+- ActiveDirectory PowerShell module (e.g., via RSAT or AD DS role)
+
+---
+
+## 🚀 Usage
+
+### 1. Show available templates
+
+Run this command to display a list of available delegation templates:
+
+```powershell
 Invoke-ADDelegationTemplate -ShowTemplates
 ```
+```Powershell
+Invoke-ADDelegationTemplate -ShowUserTemplates -ShowGroupTemplates
+```
+
+### 2. Apply a template
+
+Use this command to assign a delegation template to a specific organizational unit:
+
+```powershell
+Invoke-ADDelegationTemplate `
+  -AdIdentity "Helpdesk-Team" `
+  -DelegationOuDN "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateID 102
+```
+---
+
+## 📦 Included Templates
+
+The script currently includes built-in templates for the following scenarios:
+
+- **User objects**  
+  e.g., password reset, edit properties
+
+- **Group objects**  
+  e.g., manage membership, create/delete groups
+
+- **Computer objects**  
+  e.g., join domain, reset password
+
+- **Organizational Units (OUs)**  
+  e.g., manage, create, rename
+
+- **inetOrgPerson**  
+  Useful for LDAP or schema-based environments
+
+- **Group Policy Objects (GPOs)**  
+  e.g., link/unlink GPOs, read RSoP
+
+- **WMI Filters**  
+  Create, delete, assign filters
 
 **Show** specific categorie templates
 ```Powershell
