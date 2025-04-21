@@ -72,7 +72,15 @@ The script currently includes built-in templates for the following scenarios:
 Invoke-ADDelegationTemplate -ShowUserTemplates -ShowGroupTemplates
 ```
 
-## Use Templates (Examples)
+## Example: Helpdesk Password Reset Permissions
+A helpdesk team should be able to reset user passwords in a specific OU:
+```Powershell
+Invoke-ADDelegationTemplate `
+  -AdIdentity "Contoso\Helpdesk-Berlin" `
+  -DelegationOuDN "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateID 102
+```
+
 
 **Set** permission(s) to an Organizational Unit (OU)
 ```Powershell
@@ -108,9 +116,12 @@ Show-ADDelegationTemplateChanges -LogFilePath "$env:USERPROFILE\AdOuPermissionCh
 $templateChanges = Show-ADDelegationTemplateChanges -LogFilePath "$env:USERPROFILE\AdOuPermissionChanges.log" | Where-Object {$_.TemplateID -eq "111"}
 Revert-ADDelegationTemplate -InputObject $templateChanges
 ```
+---
 
 ## Community
-Everyone is welcome to participate.
+Suggestions, bug reports, and contributions are welcome!
+Please open an issue or submit a pull request with a clear explanation of your changes or ideas.
+---
 
 ## Source
 
