@@ -66,13 +66,9 @@ The script currently includes built-in templates for the following scenarios:
 
 - **WMI Filters**  
   Create, delete, assign filters
+---
 
-**Show** specific categorie templates
-```Powershell
-Invoke-ADDelegationTemplate -ShowUserTemplates -ShowGroupTemplates
-```
-
-## Example: Helpdesk Password Reset Permissions
+## 📝 Example: Helpdesk Password Reset Permissions
 A helpdesk team should be able to reset user passwords in a specific OU:
 ```Powershell
 Invoke-ADDelegationTemplate `
@@ -80,7 +76,6 @@ Invoke-ADDelegationTemplate `
   -DelegationOuDN "OU=UsersBerlin,DC=contoso,DC=local" `
   -TemplateID 102
 ```
-
 
 **Set** permission(s) to an Organizational Unit (OU)
 ```Powershell
@@ -119,8 +114,10 @@ Revert-ADDelegationTemplate -InputObject $templateChanges
 ---
 
 ## Community
+
 Suggestions, bug reports, and contributions are welcome!
 Please open an issue or submit a pull request with a clear explanation of your changes or ideas.
+
 ---
 
 ## Source
