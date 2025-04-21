@@ -4,7 +4,7 @@ A PowerShell script to automate delegation of permissions in Active Directory �
 
 ## 🔍 Purpose
 
-This script helps administrators assign permissions in Active Directory in a consistent, transparent, and repeatable way — without relying on the graphical Delegation Wizard.
+This script helps administrators assign permissions in Active Directory in a consistent, transparent, and repeatable way.
 
 Delegation is applied based on predefined templates for various object types such as users, groups, computers, organizational units, Group Policy Objects (GPOs), and more.
 
