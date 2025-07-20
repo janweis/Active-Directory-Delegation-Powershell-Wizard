@@ -45,6 +45,13 @@ Invoke-ADDelegationTemplate `
   -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
   -TemplateID 102
 ```
+Apply multiple templates
+```powershell
+Invoke-ADDelegationTemplate `
+  -AdIdentity "Helpdesk-Team" `
+  -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateID 102,103
+```
 ---
 
 ## 📦 Included Templates
