@@ -1,4 +1,6 @@
 # 🧰 Active Directory Delegation PowerShell Wizard
+Last Update: 2025-07
+Current Version: v1.1
 
 A PowerShell script to automate delegation of permissions in Active Directory — based on predefined templates.
 
@@ -26,6 +28,9 @@ Run this command to display a list of available delegation templates:
 ```powershell
 Invoke-ADDelegationTemplate -ShowTemplates
 ```
+```powershell
+Invoke-ADDelegationTemplate -ShowTemplatesDetailed
+```
 ```Powershell
 Invoke-ADDelegationTemplate -ShowUserTemplates -ShowGroupTemplates
 ```
@@ -37,7 +42,7 @@ Use this command to assign a delegation template to a specific organizational un
 ```powershell
 Invoke-ADDelegationTemplate `
   -AdIdentity "Helpdesk-Team" `
-  -DelegationOuDN "OU=UsersBerlin,DC=contoso,DC=local" `
+  -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
   -TemplateID 102
 ```
 ---
@@ -73,19 +78,19 @@ A helpdesk team should be able to reset user passwords in a specific OU:
 ```Powershell
 Invoke-ADDelegationTemplate `
   -AdIdentity "Contoso\Helpdesk-Berlin" `
-  -DelegationOuDN "OU=UsersBerlin,DC=contoso,DC=local" `
+  -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
   -TemplateID 102
 ```
 
 **Set** permission(s) to an Organizational Unit (OU)
 ```Powershell
-Invoke-ADDelegationTemplate -AdIdentity "ThisIsMyAdGroup" -DelegationOuDN "OU=Users,OU=MyStartOU,DC=MyDomain,DC=de" `
+Invoke-ADDelegationTemplate -AdIdentity "ThisIsMyAdGroup" -AdObjectPathDN "OU=Users,OU=MyStartOU,DC=MyDomain,DC=de" `
   -TemplateID 111
 ```
 
 **Set** permission(s) to an Organizational Unit (OU) AND **Log** changes
 ```Powershell
-Invoke-ADDelegationTemplate -AdIdentity "ThisIsMyAdGroup" -DelegationOuDN "OU=Users,OU=MyStartOU,DC=MyDomain,DC=de" `
+Invoke-ADDelegationTemplate -AdIdentity "ThisIsMyAdGroup" -AdObjectPathDN "OU=Users,OU=MyStartOU,DC=MyDomain,DC=de" `
   -TemplateID 111 -LogChanges -LogPath "$env:USERPROFILE\AdOuPermissionChanges.log"
 ```
 
