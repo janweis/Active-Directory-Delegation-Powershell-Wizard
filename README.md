@@ -1,6 +1,6 @@
 # 🧰 Active Directory Delegation PowerShell Wizard
 Last Update: 2025-07
-Current Version: v1.1
+Current Version: v1.2
 
 A PowerShell script to automate delegation of permissions in Active Directory — based on predefined templates.
 
