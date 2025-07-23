@@ -5,10 +5,15 @@
     Version: 1.1
     Web: www.it-explorations.de
 
-    [CHANGE] 
-    [NEW] I rewrote the entire Script for 
-    [NEW] Validate "AppliesTo"
+    v1.2
+    + [FIX] Issue #2 with "AppliesTo"
+    + [FIX] Issue doubled descriptions
 
+    v1.1
+    + [NEW] Complete rewrite of the script
+    + [NEW] Validate 'AppliesTo'
+    + [ADD] Missing Class-Object permissions now correct
+    + [NEW] Remove 'GenericAll' Permissions from Templates to avoid security issues
 
 #>
 <#
