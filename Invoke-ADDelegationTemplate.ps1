@@ -2,14 +2,14 @@
 
 <#
     Author: Jan Weis
-    Version: v1.1
+    Version: 1.1
     Web: www.it-explorations.de
 
-    + [NEW] Complete rewrite of the script
-    + [NEW] Validate 'AppliesTo'
-    + [ADD] Missing Class-Object permissions now correct
-    + [NEW] Remove 'GenericAll' Permissions from Templates to avoid security issues
-     
+    [CHANGE] 
+    [NEW] I rewrote the entire Script for 
+    [NEW] Validate "AppliesTo"
+
+
 #>
 <#
         .SYNOPSIS
@@ -426,7 +426,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 200
-                Description = 'Create, delete and manage groups'
+                Description = 'Template 200: Create, delete and manage groups'
                 AppliesTo = 'organizationalUnit,container'
                 Template = @(
                     #@{ Class = 'group'; Property = '@'; Right = 'GA' },
@@ -438,7 +438,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 201
-                Description = 'Create a group'
+                Description = 'Template 201: Create a group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'scope'; Property = 'group'; Right = 'CC' }
@@ -455,7 +455,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 202
-                Description = 'Delete a child group'
+                Description = 'Template 202: Delete a child group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'scope'; Property = 'group'; Right = 'DC' }
@@ -463,7 +463,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 203
-                Description = 'Delete this group'
+                Description = 'Template 203: Delete this group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = '@'; Right = 'SD' }
@@ -471,7 +471,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 204
-                Description = 'Rename a group'
+                Description = 'Template 204: Rename a group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'cn'; Right = 'WP' },
@@ -480,7 +480,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 205
-                Description = 'Specify the Pre-Windows 2000 compatible name for the group'
+                Description = 'Template 205: Specify the Pre-Windows 2000 compatible name for the group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'sAMAccountName'; Right = 'WP' }
@@ -488,7 +488,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 206
-                Description = 'Modify the description of a group'
+                Description = 'Template 206: Modify the description of a group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'description'; Right = 'WP' }
@@ -496,7 +496,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 207
-                Description = 'Modify the scope of the group'
+                Description = 'Template 207: Modify the scope of the group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'groupClass'; Right = 'WP' }
@@ -504,7 +504,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 208
-                Description = 'Modify the Class of the group'
+                Description = 'Template 208: Modify the Class of the group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'groupClass'; Right = 'WP' }
@@ -512,7 +512,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 209
-                Description = 'Modify notes for a group'
+                Description = 'Template 209: Modify notes for a group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'info'; Right = 'WP' }
@@ -520,7 +520,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 210
-                Description = 'Modify group membership'
+                Description = 'Template 210: Modify group membership'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'member'; Right = 'WP' }
@@ -528,7 +528,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 211
-                Description = 'Specify Managed-By Information of a Group'
+                Description = 'Template 211: Specify Managed-By Information of a Group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'managedBy'; Right = 'WP' }
@@ -544,7 +544,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 300
-                Description = 'Join a computer to the domain'
+                Description = 'Template 300: Join a computer to the domain'
                 AppliesTo = 'domainDNS'
                 Template = @(
                     @{ Class = 'scope'; Property = 'computer'; Right = 'CC' }
@@ -552,7 +552,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 301
-                Description = 'Create a computer account'
+                Description = 'Template 301: Create a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'scope'; Property = 'computer'; Right = 'CC' }
@@ -560,7 +560,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 302
-                Description = 'Delete a child computer account'
+                Description = 'Template 302: Delete a child computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'scope'; Property = 'computer'; Right = 'DC' }
@@ -568,7 +568,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 303
-                Description = 'Delete this computer account'
+                Description = 'Template 303: Delete this computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = '@'; Right = 'SD' }
@@ -576,7 +576,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 304
-                Description = 'Rename a computer account'
+                Description = 'Template 304: Rename a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = '@'; Right = 'WP' }
@@ -584,7 +584,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 305
-                Description = 'Disable a computer account'
+                Description = 'Template 305: Disable a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'userAccountControl'; Right = 'WP' }
@@ -592,7 +592,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 306
-                Description = 'Reset a computer account'
+                Description = 'Template 306: Reset a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'Reset Password'; Right = 'CONTROLRIGHT' }
@@ -600,7 +600,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 307
-                Description = 'Specify the computer`s description'
+                Description = 'Template 307: Specify the computer`s description'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'description'; Right = 'WP' }
@@ -608,7 +608,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 308
-                Description = 'Specify Managed-By information for a computer account'
+                Description = 'Template 308: Specify Managed-By information for a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'managedBy'; Right = 'WP' }
@@ -616,7 +616,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 309
-                Description = 'Specify that a computer account be trusted for delegation'
+                Description = 'Template 309: Specify that a computer account be trusted for delegation'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'userAccountControl'; Right = 'WP' }
@@ -632,7 +632,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 400
-                Description = 'Create an Organizational Unit'
+                Description = 'Template 400: Create an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit'
                 Template = @(
                     @{ Class = 'scope'; Property = 'organizationalUnit'; Right = 'CC' }
@@ -640,7 +640,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 401
-                Description = 'Delete a child Organizational Unit'
+                Description = 'Template 401: Delete a child Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit'
                 Template = @(
                     @{ Class = 'scope'; Property = 'organizationalUnit'; Right = 'DC' }
@@ -648,7 +648,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 402
-                Description = 'Delete this Organizational Unit'
+                Description = 'Template 402: Delete this Organizational Unit'
                 AppliesTo = 'organizationalUnit'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = '@'; Right = 'SD' }
@@ -656,7 +656,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 403
-                Description = 'Rename an Organizational Unit'
+                Description = 'Template 403: Rename an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = 'ou'; Right = 'WP' },
@@ -665,7 +665,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 404
-                Description = 'Modify Description of an Organizational Unit'
+                Description = 'Template 404: Modify Description of an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = 'description'; Right = 'WP' }
@@ -673,7 +673,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 405
-                Description = 'Modify Managed-By Information of an Organizational Unit'
+                Description = 'Template 405: Modify Managed-By Information of an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = 'managedBy'; Right = 'WP' }
@@ -681,7 +681,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 406
-                Description = 'Delegate Control of an Organizational Unit'
+                Description = 'Template 406: Delegate Control of an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = '@'; Right = 'WD' }
@@ -697,7 +697,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 500
-                Description = 'Create, delete, and manage inetOrgPerson accounts'
+                Description = 'Template 500: Create, delete, and manage inetOrgPerson accounts'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     #@{ Class = 'inetOrgPerson'; Property = '@'; Right = 'GA' },
@@ -709,7 +709,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 501
-                Description = 'Reset inetOrgPerson passwords and force password change at next logon'
+                Description = 'Template 501: Reset inetOrgPerson passwords and force password change at next logon'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'inetOrgPerson'; Property = 'Reset Password'; Right = 'CONTROLRIGHT' },
@@ -719,7 +719,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 502
-                Description = 'Read all inetOrgPerson information'
+                Description = 'Template 502: Read all inetOrgPerson information'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'inetOrgPerson'; Property = '@'; Right = 'RP' }
@@ -735,7 +735,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 600
-                Description = 'Manage Group Policy links'
+                Description = 'Template 600: Manage Group Policy links'
                 AppliesTo = 'domainDNS,organizationalUnit,site'
                 Template = @(
                     @{ Class = 'scope'; Property = 'gPLink'; Right = 'RP' },
@@ -746,7 +746,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 601
-                Description = 'Generate Resultant Set of Policy (Planning)'
+                Description = 'Template 601: Generate Resultant Set of Policy (Planning)'
                 AppliesTo = 'domainDNS,organizationalUnit'
                 Template = @(
                     @{ Class = 'scope'; Property = 'Generate Resultant Set of Policy (Planning)'; Right = 'CONTROLRIGHT' }
@@ -754,7 +754,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 602
-                Description = 'Generate Resultant Set of Policy (Logging)'
+                Description = 'Template 602: Generate Resultant Set of Policy (Logging)'
                 AppliesTo = 'domainDNS,organizationalUnit'
                 Template = @(
                     @{ Class = 'scope'; Property = 'Generate Resultant Set of Policy (Logging)'; Right = 'CONTROLRIGHT' }
@@ -770,7 +770,7 @@ function Invoke-ADDelegationTemplate {
             }
             @{
                 ID = 700
-                Description = 'Create, Delete, and Manage WMI Filters'
+                Description = 'Template 700: Create, Delete, and Manage WMI Filters'
                 AppliesTo = 'container'
                 Template = @(
                     #@{ Class = 'msWMI-Som'; Property = '@'; Right = 'GA' },
@@ -800,7 +800,7 @@ function Invoke-ADDelegationTemplate {
                 [Parameter(Mandatory)]
                 [System.DirectoryServices.ActiveDirectoryRights]$Rights,
 
-                [Parameter]
+                [Parameter()]
                 [string]$AppliesTo = $null
             )
             
@@ -813,7 +813,7 @@ function Invoke-ADDelegationTemplate {
                 [string[]]$appliesToArray = $AppliesTo.split(',')
 
                 if($appliesToArray -notcontains $adSchemaObject){
-                    Write-Warning -Message "[WARN] The Template is not supposed to apply on this ObjectClass."
+                    Write-Warning -Message "[WARN] The Template is not supposed to apply on this ObjectClass $adSchemaObject"
                 }
             }
             
@@ -867,7 +867,7 @@ function Invoke-ADDelegationTemplate {
             for ($i = 0; $i -lt $delegationTemplates.Count; $i++) {
                 $template = $delegationTemplates[$i]
 
-                # Show only Template Categorie
+                # Show Template Categorie
                 if($template.ID -like "*00") {
                     Write-Host -Object $template.Description
                     continue
