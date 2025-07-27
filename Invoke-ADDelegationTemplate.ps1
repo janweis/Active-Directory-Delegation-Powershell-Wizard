@@ -2,7 +2,7 @@
 
 <#
     Author: Jan Weis
-    Version: 1.1
+    Version: v1.2
     Web: www.it-explorations.de
 
     v1.2
@@ -14,7 +14,7 @@
     + [NEW] Validate 'AppliesTo'
     + [ADD] Missing Class-Object permissions now correct
     + [NEW] Remove 'GenericAll' Permissions from Templates to avoid security issues
-
+     
 #>
 <#
         .SYNOPSIS
@@ -39,7 +39,6 @@
         Invoke-ADDelegationTemplate -AdIdentity UserManagerPermissionGroup -AdObjectPathDN "OU=MySpecialOU,DC=ad,DC=MyADDomain,DC=de" -TemplateID 101
 #>
 function Invoke-ADDelegationTemplate {
-    [CmdletBinding()]
     param (
         [Parameter(Mandatory, ParameterSetName = 'DoTheMagic')]
         [string]$AdIdentity,
@@ -54,7 +53,7 @@ function Invoke-ADDelegationTemplate {
         [switch]$LogChanges,
 
         [Parameter(ParameterSetName = 'DoTheMagic')]
-        [string]$LogPath,
+        [string]$LogPath = "$env:USERPROFILE\Documents\DelegationTemplateChanges.txt",
 
         [Parameter(ParameterSetName = 'Viewer')]
         [switch]$ShowTemplates,
@@ -102,22 +101,22 @@ function Invoke-ADDelegationTemplate {
 
         # RightObjects for Rights
         $rightsMap = @{
-            'GA' = [System.DirectoryServices.ActiveDirectoryRights]::GenericAll
-            'GE' = [System.DirectoryServices.ActiveDirectoryRights]::GenericExecute
-            'GR' = [System.DirectoryServices.ActiveDirectoryRights]::GenericRead
-            'GW' = [System.DirectoryServices.ActiveDirectoryRights]::GenericWrite
-            'SD' = [System.DirectoryServices.ActiveDirectoryRights]::Self
-            'LC' = [System.DirectoryServices.ActiveDirectoryRights]::ListChildren
-            'LO' = [System.DirectoryServices.ActiveDirectoryRights]::ListObject
-            'CC' = [System.DirectoryServices.ActiveDirectoryRights]::CreateChild
-            'DC' = [System.DirectoryServices.ActiveDirectoryRights]::DeleteChild
-            'DT' = [System.DirectoryServices.ActiveDirectoryRights]::DeleteTree
-            'RC' = [System.DirectoryServices.ActiveDirectoryRights]::ReadControl
-            'RP' = [System.DirectoryServices.ActiveDirectoryRights]::ReadProperty
-            'WD' = [System.DirectoryServices.ActiveDirectoryRights]::WriteDacl
-            'WO' = [System.DirectoryServices.ActiveDirectoryRights]::WriteOwner
-            'WP' = [System.DirectoryServices.ActiveDirectoryRights]::WriteProperty
-            'CONTROLRIGHT' = [System.DirectoryServices.ActiveDirectoryRights]::ExtendedRight
+            'GA' = [DirectoryServices.ActiveDirectoryRights]::GenericAll
+            'GE' = [DirectoryServices.ActiveDirectoryRights]::GenericExecute
+            'GR' = [DirectoryServices.ActiveDirectoryRights]::GenericRead
+            'GW' = [DirectoryServices.ActiveDirectoryRights]::GenericWrite
+            'SD' = [DirectoryServices.ActiveDirectoryRights]::Self
+            'LC' = [DirectoryServices.ActiveDirectoryRights]::ListChildren
+            'LO' = [DirectoryServices.ActiveDirectoryRights]::ListObject
+            'CC' = [DirectoryServices.ActiveDirectoryRights]::CreateChild
+            'DC' = [DirectoryServices.ActiveDirectoryRights]::DeleteChild
+            'DT' = [DirectoryServices.ActiveDirectoryRights]::DeleteTree
+            'RC' = [DirectoryServices.ActiveDirectoryRights]::ReadControl
+            'RP' = [DirectoryServices.ActiveDirectoryRights]::ReadProperty
+            'WD' = [DirectoryServices.ActiveDirectoryRights]::WriteDacl
+            'WO' = [DirectoryServices.ActiveDirectoryRights]::WriteOwner
+            'WP' = [DirectoryServices.ActiveDirectoryRights]::WriteProperty
+            'CONTROLRIGHT' = [DirectoryServices.ActiveDirectoryRights]::ExtendedRight
         }
         
         # GUIDS for Class Properties & ControlRights
@@ -161,7 +160,7 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 100
-                Description = "`n----- USER -----`n"
+                Description = "n----- USER -----n"
             },
             @{
                 ID = 101
@@ -194,7 +193,7 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 105
+                ID = 104
                 Description = 'Create a user account in disabled state'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
@@ -202,7 +201,7 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 106
+                ID = 105
                 Description = 'Create a user account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
@@ -212,7 +211,7 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 107
+                ID = 106
                 Description = 'Delete a child user account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
@@ -220,7 +219,7 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 108
+                ID = 107
                 Description = 'Delete this user account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
@@ -228,7 +227,7 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 109
+                ID = 108
                 Description = 'Disable a user account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
@@ -236,11 +235,21 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 110
+                ID = 109
                 Description = 'Unlock a user account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'user'; Property = 'lockoutTime'; Right = 'WP' }
+                )
+            },
+            @{
+                ID = 110
+                Description = 'Rename a user account'
+                AppliesTo = 'domainDNS,organizationalUnit,container'
+                Template = @(
+                    @{ Class = 'user'; Property = 'cn'; Right = 'WP' },
+                    @{ Class = 'user'; Property = 'name'; Right = 'WP' },
+                    @{ Class = 'user'; Property = 'distinguishedName'; Right = 'WP' }
                 )
             },
             @{
@@ -253,7 +262,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 112
-                Description = 'Reset a user account`s password'
+                Description = 'Reset a user accounts password'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'user'; Property = 'Change Password'; Right = 'CONTROLRIGHT' }
@@ -261,7 +270,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 114
-                Description = 'Modify a user`s display name'
+                Description = 'Modify a users display name'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'user'; Property = 'adminDisplayName'; Right = 'WP' }
@@ -269,7 +278,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 115
-                Description = 'Modify a user account`s description'
+                Description = 'Modify a user accounts description'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'user'; Property = 'description'; Right = 'WP' }
@@ -277,7 +286,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 116
-                Description = 'Modify a user`s office location'
+                Description = 'Modify a users office location'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'user'; Property = 'physicalDeliveryOfficeName'; Right = 'WP' }
@@ -285,7 +294,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 117
-                Description = 'Modify a user`s telephone number'
+                Description = 'Modify a users telephone number'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'user'; Property = 'telephoneNumber'; Right = 'WP' }
@@ -293,7 +302,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 118
-                Description = 'Modify the location of a user`s primary web page'
+                Description = 'Modify the location of a users primary web page'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'user'; Property = 'wWWHomePage'; Right = 'WP' }
@@ -301,7 +310,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 119
-                Description = 'Modify a user`s UPN'
+                Description = 'Modify a users UPN'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'user'; Property = 'userPrincipalName'; Right = 'WP' }
@@ -309,7 +318,7 @@ function Invoke-ADDelegationTemplate {
             },
             @{
                 ID = 120
-                Description = 'Modify a user`s Pre-Windows 2000 user logon name'
+                Description = 'Modify a users Pre-Windows 2000 user logon name'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'user'; Property = 'sAMAccountName'; Right = 'WP' }
@@ -411,27 +420,18 @@ function Invoke-ADDelegationTemplate {
                     @{ Class = 'user'; Property = 'scriptPath'; Right = 'WP' }
                 )
             },
-            @{
-                ID = 133
-                Description = 'Rename a user account'
-                AppliesTo = 'domainDNS,organizationalUnit,container'
-                Template = @(
-                    @{ Class = 'user'; Property = 'cn'; Right = 'WP' },
-                    @{ Class = 'user'; Property = 'name'; Right = 'WP' },
-                    @{ Class = 'user'; Property = 'distinguishedName'; Right = 'WP' }
-                )
-            },
+
 
             #
             # GROUP
             #
             @{
                 ID = 200
-                Description = "`n--- GROUP ---`n"
+                Description = "n--- GROUP ---n"
             },
             @{
-                ID = 200
-                Description = 'Template 200: Create, delete and manage groups'
+                ID = 201
+                Description = 'Create, delete and manage groups'
                 AppliesTo = 'organizationalUnit,container'
                 Template = @(
                     #@{ Class = 'group'; Property = '@'; Right = 'GA' },
@@ -442,15 +442,15 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 201
-                Description = 'Template 201: Create a group'
+                ID = 202
+                Description = 'Create a group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'scope'; Property = 'group'; Right = 'CC' }
                 )
             },
             @{
-                ID = 204
+                ID = 203
                 Description = 'Modify the membership of a group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
@@ -459,24 +459,24 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 202
-                Description = 'Template 202: Delete a child group'
+                ID = 204
+                Description = 'Delete a child group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'scope'; Property = 'group'; Right = 'DC' }
                 )
             },
             @{
-                ID = 203
-                Description = 'Template 203: Delete this group'
+                ID = 205
+                Description = 'Delete this group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = '@'; Right = 'SD' }
                 )
             },
             @{
-                ID = 204
-                Description = 'Template 204: Rename a group'
+                ID = 206
+                Description = 'Rename a group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'cn'; Right = 'WP' },
@@ -484,56 +484,56 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 205
-                Description = 'Template 205: Specify the Pre-Windows 2000 compatible name for the group'
+                ID = 207
+                Description = 'Specify the Pre-Windows 2000 compatible name for the group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'sAMAccountName'; Right = 'WP' }
                 )
             },
             @{
-                ID = 206
-                Description = 'Template 206: Modify the description of a group'
+                ID = 208
+                Description = 'Modify the description of a group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'description'; Right = 'WP' }
                 )
             },
             @{
-                ID = 207
-                Description = 'Template 207: Modify the scope of the group'
-                AppliesTo = 'domainDNS,organizationalUnit,container'
-                Template = @(
-                    @{ Class = 'group'; Property = 'groupClass'; Right = 'WP' }
-                )
-            },
-            @{
-                ID = 208
-                Description = 'Template 208: Modify the Class of the group'
-                AppliesTo = 'domainDNS,organizationalUnit,container'
-                Template = @(
-                    @{ Class = 'group'; Property = 'groupClass'; Right = 'WP' }
-                )
-            },
-            @{
                 ID = 209
-                Description = 'Template 209: Modify notes for a group'
+                Description = 'Modify the scope of the group'
+                AppliesTo = 'domainDNS,organizationalUnit,container'
+                Template = @(
+                    @{ Class = 'group'; Property = 'groupClass'; Right = 'WP' }
+                )
+            },
+            @{
+                ID = 210
+                Description = 'Modify the Class of the group'
+                AppliesTo = 'domainDNS,organizationalUnit,container'
+                Template = @(
+                    @{ Class = 'group'; Property = 'groupClass'; Right = 'WP' }
+                )
+            },
+            @{
+                ID = 211
+                Description = 'Modify notes for a group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'info'; Right = 'WP' }
                 )
             },
             @{
-                ID = 210
-                Description = 'Template 210: Modify group membership'
+                ID = 212
+                Description = 'Modify group membership'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'member'; Right = 'WP' }
                 )
             },
             @{
-                ID = 211
-                Description = 'Template 211: Specify Managed-By Information of a Group'
+                ID = 213
+                Description = 'Specify Managed-By Information of a Group'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'group'; Property = 'managedBy'; Right = 'WP' }
@@ -545,83 +545,83 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 300
-                Description = "`n--- COMPUTER ---`n"
+                Description = "n--- COMPUTER ---n"
             },
             @{
-                ID = 300
-                Description = 'Template 300: Join a computer to the domain'
+                ID = 301
+                Description = 'Join a computer to the domain'
                 AppliesTo = 'domainDNS'
                 Template = @(
                     @{ Class = 'scope'; Property = 'computer'; Right = 'CC' }
                 )
             },
             @{
-                ID = 301
-                Description = 'Template 301: Create a computer account'
+                ID = 302
+                Description = 'Create a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'scope'; Property = 'computer'; Right = 'CC' }
                 )
             },
             @{
-                ID = 302
-                Description = 'Template 302: Delete a child computer account'
+                ID = 303
+                Description = 'Delete a child computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'scope'; Property = 'computer'; Right = 'DC' }
                 )
             },
             @{
-                ID = 303
-                Description = 'Template 303: Delete this computer account'
+                ID = 304
+                Description = 'Delete this computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = '@'; Right = 'SD' }
                 )
             },
             @{
-                ID = 304
-                Description = 'Template 304: Rename a computer account'
+                ID = 305
+                Description = 'Rename a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = '@'; Right = 'WP' }
                 )
             },
             @{
-                ID = 305
-                Description = 'Template 305: Disable a computer account'
+                ID = 306
+                Description = 'Disable a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'userAccountControl'; Right = 'WP' }
                 )
             },
             @{
-                ID = 306
-                Description = 'Template 306: Reset a computer account'
+                ID = 307
+                Description = 'Reset a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'Reset Password'; Right = 'CONTROLRIGHT' }
                 )
             },
             @{
-                ID = 307
-                Description = 'Template 307: Specify the computer`s description'
+                ID = 308
+                Description = 'Specify the computers description'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'description'; Right = 'WP' }
                 )
             },
             @{
-                ID = 308
-                Description = 'Template 308: Specify Managed-By information for a computer account'
+                ID = 309
+                Description = 'Specify Managed-By information for a computer account'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'managedBy'; Right = 'WP' }
                 )
             },
             @{
-                ID = 309
-                Description = 'Template 309: Specify that a computer account be trusted for delegation'
+                ID = 310
+                Description = 'Specify that a computer account be trusted for delegation'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'computer'; Property = 'userAccountControl'; Right = 'WP' }
@@ -633,35 +633,35 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 400
-                Description = "`n--- ORGANIZATIONAL UNIT ---`n"
+                Description = "n--- ORGANIZATIONAL UNIT ---n"
             },
             @{
-                ID = 400
-                Description = 'Template 400: Create an Organizational Unit'
+                ID = 401
+                Description = 'Create an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit'
                 Template = @(
                     @{ Class = 'scope'; Property = 'organizationalUnit'; Right = 'CC' }
                 )
             },
             @{
-                ID = 401
-                Description = 'Template 401: Delete a child Organizational Unit'
+                ID = 402
+                Description = 'Delete a child Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit'
                 Template = @(
                     @{ Class = 'scope'; Property = 'organizationalUnit'; Right = 'DC' }
                 )
             },
             @{
-                ID = 402
-                Description = 'Template 402: Delete this Organizational Unit'
+                ID = 403
+                Description = 'Delete this Organizational Unit'
                 AppliesTo = 'organizationalUnit'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = '@'; Right = 'SD' }
                 )
             },
             @{
-                ID = 403
-                Description = 'Template 403: Rename an Organizational Unit'
+                ID = 404
+                Description = 'Rename an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = 'ou'; Right = 'WP' },
@@ -669,24 +669,24 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 404
-                Description = 'Template 404: Modify Description of an Organizational Unit'
+                ID = 405
+                Description = 'Modify Description of an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = 'description'; Right = 'WP' }
                 )
             },
             @{
-                ID = 405
-                Description = 'Template 405: Modify Managed-By Information of an Organizational Unit'
+                ID = 406
+                Description = 'Modify Managed-By Information of an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = 'managedBy'; Right = 'WP' }
                 )
             },
             @{
-                ID = 406
-                Description = 'Template 406: Delegate Control of an Organizational Unit'
+                ID = 407
+                Description = 'Delegate Control of an Organizational Unit'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'organizationalUnit'; Property = '@'; Right = 'WD' }
@@ -698,11 +698,11 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 500
-                Description = "`n--- INETORGPERSON ---`n"
+                Description = "n--- INETORGPERSON ---n"
             },
             @{
-                ID = 500
-                Description = 'Template 500: Create, delete, and manage inetOrgPerson accounts'
+                ID = 501
+                Description = 'Create, delete, and manage inetOrgPerson accounts'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     #@{ Class = 'inetOrgPerson'; Property = '@'; Right = 'GA' },
@@ -713,8 +713,8 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 501
-                Description = 'Template 501: Reset inetOrgPerson passwords and force password change at next logon'
+                ID = 502
+                Description = 'Reset inetOrgPerson passwords and force password change at next logon'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'inetOrgPerson'; Property = 'Reset Password'; Right = 'CONTROLRIGHT' },
@@ -723,8 +723,8 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 502
-                Description = 'Template 502: Read all inetOrgPerson information'
+                ID = 503
+                Description = 'Read all inetOrgPerson information'
                 AppliesTo = 'domainDNS,organizationalUnit,container'
                 Template = @(
                     @{ Class = 'inetOrgPerson'; Property = '@'; Right = 'RP' }
@@ -736,11 +736,11 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 600
-                Description = "`n--- GROUP POLICY ---`n"
+                Description = "n--- GROUP POLICY ---n"
             },
             @{
-                ID = 600
-                Description = 'Template 600: Manage Group Policy links'
+                ID = 601
+                Description = 'Manage Group Policy links'
                 AppliesTo = 'domainDNS,organizationalUnit,site'
                 Template = @(
                     @{ Class = 'scope'; Property = 'gPLink'; Right = 'RP' },
@@ -750,16 +750,16 @@ function Invoke-ADDelegationTemplate {
                 )
             },
             @{
-                ID = 601
-                Description = 'Template 601: Generate Resultant Set of Policy (Planning)'
+                ID = 602
+                Description = 'Generate Resultant Set of Policy (Planning)'
                 AppliesTo = 'domainDNS,organizationalUnit'
                 Template = @(
                     @{ Class = 'scope'; Property = 'Generate Resultant Set of Policy (Planning)'; Right = 'CONTROLRIGHT' }
                 )
             },
             @{
-                ID = 602
-                Description = 'Template 602: Generate Resultant Set of Policy (Logging)'
+                ID = 603
+                Description = 'Generate Resultant Set of Policy (Logging)'
                 AppliesTo = 'domainDNS,organizationalUnit'
                 Template = @(
                     @{ Class = 'scope'; Property = 'Generate Resultant Set of Policy (Logging)'; Right = 'CONTROLRIGHT' }
@@ -771,11 +771,11 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 700
-                Description = "`n--- WMI FILTERS ---`n"
+                Description = "n--- WMI FILTERS ---n"
             }
             @{
-                ID = 700
-                Description = 'Template 700: Create, Delete, and Manage WMI Filters'
+                ID = 701
+                Description = 'Create, Delete, and Manage WMI Filters'
                 AppliesTo = 'container'
                 Template = @(
                     #@{ Class = 'msWMI-Som'; Property = '@'; Right = 'GA' },
@@ -803,10 +803,9 @@ function Invoke-ADDelegationTemplate {
                 [string]$PropertyGUID,
                 
                 [Parameter(Mandatory)]
-                [System.DirectoryServices.ActiveDirectoryRights]$Rights,
+                [DirectoryServices.ActiveDirectoryRights]$Rights,
 
-                [Parameter()]
-                [string]$AppliesTo = $null
+                [string]$AppliesTo = ''
             )
             
             $adObject = [ADSI]"LDAP://$ObjectPathDN"
@@ -818,7 +817,7 @@ function Invoke-ADDelegationTemplate {
                 [string[]]$appliesToArray = $AppliesTo.split(',')
 
                 if($appliesToArray -notcontains $adSchemaObject){
-                    Write-Warning -Message "[WARN] The Template is not supposed to apply on this ObjectClass $adSchemaObject"
+                    Write-Warning -Message "[WARN] The Template is not supposed to apply on this ObjectClass."
                 }
             }
             
@@ -826,11 +825,11 @@ function Invoke-ADDelegationTemplate {
             if($ClassGUID -eq 0) {
                 # SCOPE
                 $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
-                    [System.Security.Principal.NTAccount]$Identity, 
-                    [System.DirectoryServices.ActiveDirectoryRights]$Rights,
-                    [System.Security.AccessControl.AccessControlType]::Allow,
+                    [Security.Principal.NTAccount]$Identity, 
+                    [DirectoryServices.ActiveDirectoryRights]$Rights,
+                    [Security.AccessControl.AccessControlType]::Allow,
                     [GUID]$PropertyGUID,
-                    [System.DirectoryServices.ActiveDirectorySecurityInheritance]::All
+                    [DirectoryServices.ActiveDirectorySecurityInheritance]::All
                 )
             }
             else
@@ -839,10 +838,10 @@ function Invoke-ADDelegationTemplate {
                 If($PropertyGUID -eq 0) {
                     # @
                     $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
-                        [System.Security.Principal.NTAccount]$Identity, 
-                        [System.DirectoryServices.ActiveDirectoryRights]$Rights,
-                        [System.Security.AccessControl.AccessControlType]::Allow,
-                        [System.DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
+                        [Security.Principal.NTAccount]$Identity, 
+                        [DirectoryServices.ActiveDirectoryRights]$Rights,
+                        [Security.AccessControl.AccessControlType]::Allow,
+                        [DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
                         [GUID]$ClassGUID
                     )
                 }
@@ -850,11 +849,11 @@ function Invoke-ADDelegationTemplate {
                 {
                     # PROPERTY
                     $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
-                        [System.Security.Principal.NTAccount]$Identity, 
-                        [System.DirectoryServices.ActiveDirectoryRights]$Rights,
-                        [System.Security.AccessControl.AccessControlType]::Allow,
+                        [Security.Principal.NTAccount]$Identity, 
+                        [DirectoryServices.ActiveDirectoryRights]$Rights,
+                        [Security.AccessControl.AccessControlType]::Allow,
                         [GUID]$PropertyGUID,
-                        [System.DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
+                        [DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
                         [GUID]$ClassGUID
                     )
                 }
@@ -863,7 +862,7 @@ function Invoke-ADDelegationTemplate {
             $adObject.ObjectSecurity.AddAccessRule($ace)    
             $adObject.CommitChanges()
             
-            $verboseMessage = "[*] Applied permission:`n`t=> ADIdentity = $Identity,`n`t=> OU = $ObjectPathDN,`n`t=> Right = $Rights,`n`t=> Object Class GUID = $ClassGUID,`n`t=> Property GUID = $PropertyGUID"
+            $verboseMessage = "[*] Applied permission:nt=> ADIdentity = $Identity,nt=> OU = $ObjectPathDN,nt=> Right = $Rights,nt=> Object Class GUID = $ClassGUID,nt=> Property GUID = $PropertyGUID"
             Write-Verbose -Message $verboseMessage
         }
 
@@ -872,7 +871,7 @@ function Invoke-ADDelegationTemplate {
             for ($i = 0; $i -lt $delegationTemplates.Count; $i++) {
                 $template = $delegationTemplates[$i]
 
-                # Show Template Categorie
+                # Show only Template Categorie
                 if($template.ID -like "*00") {
                     Write-Host -Object $template.Description
                     continue
@@ -886,7 +885,7 @@ function Invoke-ADDelegationTemplate {
                     if ($template.Template) {
                         Write-Host "   Rules:"
                         foreach ($rule in $template.Template) {
-                            Write-Host "`tClass: $($rule.Class) | Property: $($rule.Property) | Right: $($rule.Right)"
+                            Write-Host "tClass: $($rule.Class) | Property: $($rule.Property) | Right: $($rule.Right)"
                         }
                     }
                 }
@@ -900,46 +899,41 @@ function Invoke-ADDelegationTemplate {
             $categorieTemplates = $delegationTemplates | Where-Object {($_.ID -ge $CategoryStart) -and ($_.ID -lt $nextHundred)}
 
             for ($i = 0; $i -lt $categorieTemplates.Count; $i++) {
-                Write-Host -Object "$($categorieTemplates[$i].Description)"
+                if($categorieTemplates[$i].ID -like "*00") {
+                    Write-Host -Object $categorieTemplates[$i].Description
+                    continue
+                }
+
+                Write-Host -Object ("Template {0}: {1}" -f $categorieTemplates[$i].ID, $categorieTemplates[$i].Description)
             }
         }
 
         # Writes a Logging for Changes, to revert Changes easyly
         function Write-PermissionChangesToLog {
-            [CmdletBinding()]
             param (
                 [Parameter(Mandatory)]
-                [string]$LogFilePath,
+                [PSCustomObject]$LogInput,
 
                 [Parameter(Mandatory)]
                 [string]$TemplateID,
 
                 [Parameter(Mandatory)]
-                [string]$ObjectPathDN,
-
-                [Parameter(Mandatory)]
-                [string]$Identity,
-
-                [Parameter(Mandatory)]
-                [System.DirectoryServices.ActiveDirectoryRights]$Rights,
-
-                [string]$ClassGUID = $null,
-                [string]$PropertyGUID = $null
+                [string]$Path
             )
 
-            $currentDate = (Get-Date).ToShortDateString()
-            $currentTime = (Get-Date).ToShortTimeString()
-            
-            # Datum, Uhrzeit, TemplateID, OU, Identity, Permisson, ObjectClass, Property,
-            $fileData = "$currentDate;$currentTime;$TemplateID;$ObjectPathDN;$Identity;$Rights;$ClassGUID;$PropertyGUID;"
+            $tempInput = $LogInput
+            $tempInput | Add-Member -MemberType NoteProperty -Name TemplateID -Value $TemplateID
+            $tempInput | Add-Member -MemberType NoteProperty -Name Date -Value (Get-Date).ToShortDateString()
+            $tempInput | Add-Member -MemberType NoteProperty -Name Time -Value (Get-Date).ToShortTimeString()
 
             try {
-                Out-File -FilePath $LogFilePath -InputObject $fileData -Encoding utf8 -Append -NoClobber | Out-Null
+                Export-Csv -InputObject $tempInput -Path $Path -Delimiter ";" -NoTypeInformation -Encoding UTF8
             }
             catch {
                 Write-Error -Message "[Err] Could not write Log for permission changes! $_"
             }
         }
+
     }
     
     process {
@@ -1002,11 +996,10 @@ function Invoke-ADDelegationTemplate {
                         'ClassGUID' =     $classGuidsMap[$rule.Class]
                         'PropertyGUID' =  $propertyGUID
                         'Right' =         $rightsMap[$rule.Right]
-                        'AppliesTo' =     $selectedTemplate.AppliesTo
                     }
                 
                     # Set Permissions to Object
-                    Grant-AdPermission @params
+                    Grant-AdPermission @params -AppliesTo $selectedTemplate.AppliesTo
                 
                     # Log changes
                     if ($LogChanges) {
@@ -1014,7 +1007,7 @@ function Invoke-ADDelegationTemplate {
                             Write-Error -Message '[err] No LogPath found. Please Enter a valid -LogPath'
                         }
                         else {
-                            Write-PermissionChangesToLog -TemplateID $templateID -LogFilePath $LogPath @params
+                            Write-PermissionChangesToLog -LogInput ([PSCustomObject]$params) -TemplateID $selectedTemplate.ID -Path $LogPath
                         }
                     }
 
