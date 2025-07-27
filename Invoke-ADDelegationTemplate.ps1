@@ -160,7 +160,7 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 100
-                Description = "n----- USER -----n"
+                Description = "`n----- USER -----`n"
             },
             @{
                 ID = 101
@@ -427,7 +427,7 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 200
-                Description = "n--- GROUP ---n"
+                Description = "`n--- GROUP ---`n"
             },
             @{
                 ID = 201
@@ -545,7 +545,7 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 300
-                Description = "n--- COMPUTER ---n"
+                Description = "`n--- COMPUTER ---`n"
             },
             @{
                 ID = 301
@@ -633,7 +633,7 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 400
-                Description = "n--- ORGANIZATIONAL UNIT ---n"
+                Description = "`n--- ORGANIZATIONAL UNIT ---`n"
             },
             @{
                 ID = 401
@@ -698,7 +698,7 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 500
-                Description = "n--- INETORGPERSON ---n"
+                Description = "`n--- INETORGPERSON ---`n"
             },
             @{
                 ID = 501
@@ -736,7 +736,7 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 600
-                Description = "n--- GROUP POLICY ---n"
+                Description = "`n--- GROUP POLICY ---`n"
             },
             @{
                 ID = 601
@@ -771,7 +771,7 @@ function Invoke-ADDelegationTemplate {
             #
             @{
                 ID = 700
-                Description = "n--- WMI FILTERS ---n"
+                Description = "`n--- WMI FILTERS ---`n"
             }
             @{
                 ID = 701
@@ -817,7 +817,7 @@ function Invoke-ADDelegationTemplate {
                 [string[]]$appliesToArray = $AppliesTo.split(',')
 
                 if($appliesToArray -notcontains $adSchemaObject){
-                    Write-Warning -Message "[WARN] The Template is not supposed to apply on this ObjectClass."
+                    Write-Warning -Message '[WARN] The Template is not supposed to apply on this ObjectClass.'
                 }
             }
             
@@ -872,7 +872,7 @@ function Invoke-ADDelegationTemplate {
                 $template = $delegationTemplates[$i]
 
                 # Show only Template Categorie
-                if($template.ID -like "*00") {
+                if($template.ID -like '*00') {
                     Write-Host -Object $template.Description
                     continue
                 }
@@ -883,7 +883,7 @@ function Invoke-ADDelegationTemplate {
                         Write-Host "   AppliesTo: $($template.AppliesTo)"
                     }
                     if ($template.Template) {
-                        Write-Host "   Rules:"
+                        Write-Host '   Rules:'
                         foreach ($rule in $template.Template) {
                             Write-Host "tClass: $($rule.Class) | Property: $($rule.Property) | Right: $($rule.Right)"
                         }
@@ -899,7 +899,7 @@ function Invoke-ADDelegationTemplate {
             $categorieTemplates = $delegationTemplates | Where-Object {($_.ID -ge $CategoryStart) -and ($_.ID -lt $nextHundred)}
 
             for ($i = 0; $i -lt $categorieTemplates.Count; $i++) {
-                if($categorieTemplates[$i].ID -like "*00") {
+                if($categorieTemplates[$i].ID -like '*00') {
                     Write-Host -Object $categorieTemplates[$i].Description
                     continue
                 }
@@ -927,7 +927,7 @@ function Invoke-ADDelegationTemplate {
             $tempInput | Add-Member -MemberType NoteProperty -Name Time -Value (Get-Date).ToShortTimeString()
 
             try {
-                Export-Csv -InputObject $tempInput -Path $Path -Delimiter ";" -NoTypeInformation -Encoding UTF8
+                Export-Csv -InputObject $tempInput -Path $Path -Delimiter ';' -NoTypeInformation -Encoding UTF8
             }
             catch {
                 Write-Error -Message "[Err] Could not write Log for permission changes! $_"
