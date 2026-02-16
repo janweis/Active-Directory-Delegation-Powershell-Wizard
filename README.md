@@ -1,4 +1,4 @@
-# 🧰 Invoke-ADDelegationTemplate — AD Delegation Wizard
+# 🧰 Active Directory Delegation PowerShell Wizard
 
 > **Version:** v1.3-dev &nbsp;|&nbsp; **Last update:** 2026-02 &nbsp;|&nbsp; **Author:** Jan Weis
 
