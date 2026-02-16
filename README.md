@@ -268,7 +268,6 @@ Each JSON file contains an array of templates:
 |---|---|
 | `Revert-ADDelegationTemplate.ps1` | Revert previously applied permissions using a log file |
 | `Show-ADDelegationTemplateChanges.ps1` | Display logged permission changes (formatted or raw) |
-| `Get-TemplateFromPermission.ps1` | Reverse-engineer: generate a template from existing AD permissions |
 
 ---
 
