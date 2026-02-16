@@ -1,0 +1,27 @@
+{
+  "ID": 701,
+  "Description": "Create, Delete, and Manage WMI Filters",
+  "AppliesTo": "container",
+  "Template": [
+    {
+      "Property": "@",
+      "Class": "msWMI-Som",
+      "Right": "ReadProperty"
+    },
+    {
+      "Property": "@",
+      "Class": "msWMI-Som",
+      "Right": "WriteProperty"
+    },
+    {
+      "Property": "msWMI-Som",
+      "Class": "scope",
+      "Right": "CreateChild"
+    },
+    {
+      "Property": "msWMI-Som",
+      "Class": "scope",
+      "Right": "DeleteChild"
+    }
+  ]
+}

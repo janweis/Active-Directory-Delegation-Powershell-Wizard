@@ -1,0 +1,91 @@
+[
+  {
+    "ID": 400,
+    "Description": "Create an Organizational Unit",
+    "AppliesTo": "domainDNS,organizationalUnit",
+    "Template": [
+      {
+        "Property": "organizationalUnit",
+        "Class": "scope",
+        "Right": "CreateChild"
+      }
+    ]
+  },
+  {
+    "ID": 401,
+    "Description": "Delete a child Organizational Unit",
+    "AppliesTo": "domainDNS,organizationalUnit",
+    "Template": [
+      {
+        "Property": "organizationalUnit",
+        "Class": "scope",
+        "Right": "DeleteChild"
+      }
+    ]
+  },
+  {
+    "ID": 402,
+    "Description": "Delete this Organizational Unit",
+    "AppliesTo": "organizationalUnit",
+    "Template": [
+      {
+        "Property": "@",
+        "Class": "organizationalUnit",
+        "Right": "Self"
+      }
+    ]
+  },
+  {
+    "ID": 403,
+    "Description": "Rename an Organizational Unit",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "ou",
+        "Class": "organizationalUnit",
+        "Right": "WriteProperty"
+      },
+      {
+        "Property": "name",
+        "Class": "organizationalUnit",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 404,
+    "Description": "Modify Description of an Organizational Unit",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "description",
+        "Class": "organizationalUnit",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 405,
+    "Description": "Modify Managed-By Information of an Organizational Unit",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "managedBy",
+        "Class": "organizationalUnit",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 406,
+    "Description": "Delegate Control of an Organizational Unit",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "@",
+        "Class": "organizationalUnit",
+        "Right": "WriteDacl"
+      }
+    ]
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "ID": 999,
+    "Description": "Invalid right test",
+    "AppliesTo": "domainDNS",
+    "Template": [
+      { "Property": "@", "Class": "user", "Right": "BadRight" }
+    ]
+  }
+]

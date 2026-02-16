@@ -1,0 +1,183 @@
+[
+  {
+    "ID": 200,
+    "Description": "Create, delete and manage groups",
+    "AppliesTo": "organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "@",
+        "Class": "group",
+        "Right": "ReadProperty"
+      },
+      {
+        "Property": "@",
+        "Class": "group",
+        "Right": "WriteProperty"
+      },
+      {
+        "Property": "group",
+        "Class": "scope",
+        "Right": "CreateChild"
+      },
+      {
+        "Property": "group",
+        "Class": "scope",
+        "Right": "DeleteChild"
+      }
+    ]
+  },
+  {
+    "ID": 201,
+    "Description": "Create a group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "group",
+        "Class": "scope",
+        "Right": "CreateChild"
+      }
+    ]
+  },
+  {
+    "ID": 204,
+    "Description": "Modify the membership of a group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "member",
+        "Class": "group",
+        "Right": "ReadProperty"
+      },
+      {
+        "Property": "member",
+        "Class": "group",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 202,
+    "Description": "Delete a child group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "group",
+        "Class": "scope",
+        "Right": "DeleteChild"
+      }
+    ]
+  },
+  {
+    "ID": 203,
+    "Description": "Delete this group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "@",
+        "Class": "group",
+        "Right": "Self"
+      }
+    ]
+  },
+  {
+    "ID": 204,
+    "Description": "Rename a group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "cn",
+        "Class": "group",
+        "Right": "WriteProperty"
+      },
+      {
+        "Property": "name",
+        "Class": "group",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 205,
+    "Description": "Specify the Pre-Windows 2000 compatible name for the group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "sAMAccountName",
+        "Class": "group",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 206,
+    "Description": "Modify the description of a group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "description",
+        "Class": "group",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 207,
+    "Description": "Modify the scope of the group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "groupClass",
+        "Class": "group",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 208,
+    "Description": "Modify the Class of the group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "groupClass",
+        "Class": "group",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 209,
+    "Description": "Modify notes for a group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "info",
+        "Class": "group",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 210,
+    "Description": "Modify group membership",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "member",
+        "Class": "group",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": 211,
+    "Description": "Specify Managed-By Information of a Group",
+    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "Template": [
+      {
+        "Property": "managedBy",
+        "Class": "group",
+        "Right": "WriteProperty"
+      }
+    ]
+  }
+]

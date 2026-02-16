@@ -1,25 +1,8 @@
-#requires -Version 3.0
-
-<#
-    Author: Jan Weis
-    Mail: jan.weis@it-explorations.de
-    Version: v1.0
-#>
-
-<#
-.Synopsis
-   Revert the made changes in Active Directory 
-.DESCRIPTION
-   Revert the changes on an Object in Active Directory
-.EXAMPLE
-   $changes = Show-ADDelegationTemplateChanges -LogFilePath "$env:USERPROFILE\Documents\DelegationTemplateChanges.txt"
-   Revert-ADDelegationTemplate -InputObject $changes
-#>
-
 function Revert-ADDelegationTemplate {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [PSCustomObject[]]
+        [hashtable[]]
         $InputObject
     )
     
@@ -30,76 +13,66 @@ function Revert-ADDelegationTemplate {
                 [string]$Identity,
             
                 [Parameter(Mandatory)]
-                [string]$ObjectPathDN,
-                
-                [Parameter(Mandatory)]
-                [string]$ClassGUID,
-                
-                [Parameter(Mandatory)]
-                [string]$PropertyGUID,
+                [string]$OrganizationalUnitDN,
                 
                 [Parameter(Mandatory)]
                 [System.DirectoryServices.ActiveDirectoryRights]$Rights,
-
-                [string]$Date = '',
-                [string]$Time = '',
-                [string]$TemplateID = ''
+                
+                [string]$ObjectTypeGUID = $null,
+                [string]$ControlRight = $null,
+                [string]$PropertyGUID = $null
             )
 
-            $adObject = [ADSI]"LDAP://$ObjectPathDN"
+            $adObject = [ADSI]"LDAP://$OrganizationalUnitDN"
 
-            if($ClassGUID -eq 0) {
-                # SCOPE
+            if ($ControlRight) {
+                $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
+                    [System.Security.Principal.NTAccount]$Identity, 
+                    [System.DirectoryServices.ActiveDirectoryRights]::ExtendedRight, 
+                    [System.Security.AccessControl.AccessControlType]::Allow, 
+                    [guid]$ControlRight
+                )
+            }
+            elseif ($PropertyGUID) {
                 $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
                     [System.Security.Principal.NTAccount]$Identity, 
                     [System.DirectoryServices.ActiveDirectoryRights]$Rights,
-                    [System.Security.AccessControl.AccessControlType]::Allow,
-                    [GUID]$PropertyGUID,
-                    [System.DirectoryServices.ActiveDirectorySecurityInheritance]::All
+                    [System.Security.AccessControl.AccessControlType]::Allow, 
+                    [guid]$PropertyGUID,
+                    [System.DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
+                    [guid]$ObjectTypeGUID
                 )
             }
-            else
-            {
-                # CLASS
-                If($PropertyGUID -eq 0) {
-                    # @
-                    $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
-                        [System.Security.Principal.NTAccount]$Identity, 
-                        [System.DirectoryServices.ActiveDirectoryRights]$Rights,
-                        [System.Security.AccessControl.AccessControlType]::Allow,
-                        [System.DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
-                        [GUID]$ClassGUID
-                    )
-                }
-                else
-                {
-                    # PROPERTY
-                    $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
-                        [System.Security.Principal.NTAccount]$Identity, 
-                        [System.DirectoryServices.ActiveDirectoryRights]$Rights,
-                        [System.Security.AccessControl.AccessControlType]::Allow,
-                        [GUID]$PropertyGUID,
-                        [System.DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
-                        [GUID]$ClassGUID
-                    )
-                }
+            else {
+                $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
+                    [System.Security.Principal.NTAccount]$Identity, 
+                    [System.DirectoryServices.ActiveDirectoryRights]$Rights, 
+                    [System.Security.AccessControl.AccessControlType]::Allow,
+                    [System.DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
+                    [guid]$ObjectTypeGUID
+                )
             }
 
             $adObject.ObjectSecurity.RemoveAccessRule($ace)
             $adObject.CommitChanges()
-            Write-Verbose -Message ("[*] Revoked permission:`n`tADIdentity = {4} `n`t => Rights = {0}`n`t => Class GUID = {1}`n`t => Property GUID = {2}`n`t OU = {3}" -f $Rights, $ClassGUID, $PropertyGUID, $ObjectPathDN, $Identity)
+            Write-Verbose -Message "[*] Revoked permission:`n`tRights = $Rights`n`t => Object Type GUID = $ObjectTypeGUID`n`t => Property GUID = $PropertyGUID`n`t => Control Right = $ControlRight`n`t OU = $OrganizationalUnitDN `n`tADIdentity = $Identity"
         }
     }
     
     process {
+        
+        $InputObject | ForEach-Object {
 
-        Foreach($revertObject in $InputObject) {
-            
-            $params = @{}
-            $revertObject.psobject.properties | ForEach-Object { $params[$_.Name] = $_.Value }
-            
-            Revoke-AdPermission @params
+            try {
+                
+                Revoke-AdPermission -Identity $_.Identity -OrganizationalUnitDN $_.OrganizationalUnitDN -Rights $_.Rights -ObjectTypeGUID $_.ObjectTypeGUID `
+                    -PropertyGUID $_.PropertyGUID -ControlRight $_.ControlRight
+            }
+            catch {
+                Write-Error -Message "[ERR] Could not undo permissions! $_"
+            }
         }
+
     }
     
     end {
