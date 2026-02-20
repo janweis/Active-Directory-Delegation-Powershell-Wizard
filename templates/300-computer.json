@@ -130,21 +130,77 @@
     ]
   },
   {
-    "ID": "310",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "",
-    "ObjectTypes": "SCOPE",
+    "ID":  "310",
+    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
+    "Description":  "ReJoin a computer to a domain",
+    "ObjectTypes":  "computer,scope",
     "Template": [
-      {
-        "ObjectType": "SCOPE",
-        "Property": "computer",
-        "Right": "CreateChild,DeleteChild"
-      },
-      {
-        "ObjectType": "computer",
-        "Property": "@",
-        "Right": "ExtendedRight"
-      }
+     {
+         "ObjectType":  "scope",
+         "Property":  "computer",
+         "Right":  "CreateChild, DeleteChild"
+     },
+     {
+         "ObjectType":  "computer",
+         "Property":  "Account Restrictions",
+         "Right":  "ReadProperty, WriteProperty"
+     },
+     {
+         "ObjectType":  "computer",
+         "Property":  "Validated write to service principal name",
+         "Right":  "Self"
+     },
+     {
+         "ObjectType":  "computer",
+         "Property":  "Validated write to DNS host name",
+         "Right":  "Self"
+     },
+     {
+         "ObjectType":  "computer",
+         "Property":  "Reset Password",
+         "Right":  "ExtendedRight"
+     }
     ]
-  }
+  },
+  {
+    "ID":  "311",
+    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
+    "Description":  "Move a computer account to a different organizationalUnit (source)",
+    "ObjectTypes":  "computer,scope",
+    "Template":  [
+     {
+         "ObjectType":  "scope",
+         "Property":  "computer",
+         "Right":  "DeleteChild"
+     },
+     {
+         "ObjectType":  "computer",
+         "Property":  "distinguishedName",
+         "Right":  "WriteProperty"
+     },
+     {
+         "ObjectType":  "computer",
+         "Property":  "cn",
+         "Right":  "WriteProperty"
+     },
+     {
+         "ObjectType":  "computer",
+         "Property":  "name",
+         "Right":  "WriteProperty"
+     }
+    ]
+  },
+  {
+    "ID":  "312",
+    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
+    "Description":  "Move a computer account to a different organizationalUnit (destination)",
+    "ObjectTypes":  "scope",
+    "Template":  [
+     {
+         "ObjectType":  "scope",
+         "Property":  "computer",
+         "Right":  "CreateChild"
+     }
+    ]
+  } 
 ]

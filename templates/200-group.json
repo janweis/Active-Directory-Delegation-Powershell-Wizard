@@ -187,5 +187,46 @@
         "Right": "WriteProperty"
       }
     ]
+  },
+  {
+    "ID":  "213",
+    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
+    "Description":  "Move a group to a different organizationalUnit (source)",
+    "ObjectTypes":  "group,scope",
+    "Template":  [
+     {
+         "ObjectType":  "scope",
+         "Property":  "group",
+         "Right":  "DeleteChild"
+     },
+     {
+         "ObjectType":  "group",
+         "Property":  "distinguishedName",
+         "Right":  "WriteProperty"
+     },
+     {
+         "ObjectType":  "group",
+         "Property":  "cn",
+         "Right":  "WriteProperty"
+     },
+     {
+         "ObjectType":  "group",
+         "Property":  "name",
+         "Right":  "WriteProperty"
+     }
+    ]
+  },
+  {
+    "ID":  "214",
+    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
+    "Description":  "Move a group to a different organizationalUnit (destination)",
+    "ObjectTypes":  "scope",
+    "Template":  [
+     {
+         "ObjectType":  "scope",
+         "Property":  "group",
+         "Right":  "CreateChild"
+     }
+    ]
   }
 ]

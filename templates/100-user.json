@@ -472,5 +472,46 @@
         "Right": "WriteProperty"
       }
     ]
+  },
+  {
+    "ID":  "133",
+    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
+    "Description":  "Move a user account to a different organizationalUnit (source)",
+    "ObjectTypes":  "user,scope",
+    "Template":  [
+     {
+         "ObjectType":  "scope",
+         "Property":  "user",
+         "Right":  "DeleteChild"
+     },
+     {
+         "ObjectType":  "user",
+         "Property":  "distinguishedName",
+         "Right":  "WriteProperty"
+     },
+     {
+         "ObjectType":  "user",
+         "Property":  "cn",
+         "Right":  "WriteProperty"
+     },
+     {
+         "ObjectType":  "user",
+         "Property":  "name",
+         "Right":  "WriteProperty"
+     }
+    ]
+  },
+  {
+    "ID":  "134",
+    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
+    "Description":  "Move a user account to a different organizationalUnit (destination)",
+    "ObjectTypes":  "scope",
+    "Template":  [
+     {
+         "ObjectType":  "scope",
+         "Property":  "user",
+         "Right":  "CreateChild"
+     }
+    ]
   }
 ]
