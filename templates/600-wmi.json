@@ -7,17 +7,17 @@
     {
       "ObjectType": "SCOPE",
       "Property": "msWMI-Som",
-      "Right": "CreateChild",
+      "Right": "CreateChild"
     },
     {
       "ObjectType": "SCOPE",
       "Property": "msWMI-Som",
-      "Right": "DeleteChild",
+      "Right": "DeleteChild"
     },
     {
       "ObjectType": "msWMI-Som",
       "Property": "@",
-      "Right": "GenericAll",
+      "Right": "GenericAll"
     }
   ]
 }

@@ -8,7 +8,7 @@
       {
         "ObjectType": "SCOPE",
         "Property": "computer",
-        "Right": "CreateChild",
+        "Right": "CreateChild"
       }
     ]
   },
@@ -21,7 +21,7 @@
       {
         "ObjectType": "SCOPE",
         "Property": "computer",
-        "Right": "CreateChild",
+        "Right": "CreateChild"
       }
     ]
   },
@@ -34,7 +34,7 @@
       {
         "ObjectType": "SCOPE",
         "Property": "computer",
-        "Right": "DeleteChild",
+        "Right": "DeleteChild"
       }
     ]
   },
@@ -47,7 +47,7 @@
       {
         "ObjectType": "computer",
         "Property": "@",
-        "Right": "Delete",
+        "Right": "Delete"
       }
     ]
   },
@@ -60,7 +60,7 @@
       {
         "ObjectType": "computer",
         "Property": "@",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       }
     ]
   },
@@ -73,7 +73,7 @@
       {
         "ObjectType": "computer",
         "Property": "userAccountControl",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       }
     ]
   },
@@ -86,7 +86,7 @@
       {
         "ObjectType": "computer",
         "Property": "Reset Password",
-        "Right": "ExtendedRight",
+        "Right": "ExtendedRight"
       }
     ]
   },
@@ -99,7 +99,7 @@
       {
         "ObjectType": "computer",
         "Property": "description",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       }
     ]
   },
@@ -112,7 +112,7 @@
       {
         "ObjectType": "computer",
         "Property": "managedBy",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       }
     ]
   },
@@ -125,7 +125,25 @@
       {
         "ObjectType": "computer",
         "Property": "userAccountControl",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "310",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "computer",
+        "Right": "CreateChild,DeleteChild"
+      },
+      {
+        "ObjectType": "computer",
+        "Property": "@",
+        "Right": "ExtendedRight"
       }
     ]
   }

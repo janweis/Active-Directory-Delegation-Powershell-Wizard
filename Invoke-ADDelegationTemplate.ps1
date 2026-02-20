@@ -529,13 +529,18 @@ process {
                     $ObjectType = $permissionTemplate.Property
                 }
                 else {
-                    if($permissionTemplate.Right -match 'ExtendedRight') {
+                    if("ExtendedRight","Self" -contains $permissionTemplate.Right) {
                         # For Extended Rights, we need to look up the rightsGuid instead of ObjectGUID
-                        $ObjectType = Get-ObjectTypeGUID -Name $permissionTemplate.Property -GuidStore 'ExtendedRights'
+                        $ObjectType = Get-ObjectTypeGUID -Name $permissionTemplate.Property -GuidStore 'ExtendedRights' | Select-Object -First 1
                     }
                     else {
                         # For regular properties, we look up the ObjectGUID in the schema
                         $ObjectType = Get-ObjectTypeGUID -Name $permissionTemplate.Property -GuidStore 'Schema'
+
+                        # Backup plan: If the property name cannot be resolved and is a GUID, it might be an extended right, so we try looking it up in ExtendedRights as well.
+                        if ($null -eq $ObjectType) {
+                            $ObjectType = Get-ObjectTypeGUID -Name $permissionTemplate.Property -GuidStore 'ExtendedRights' | Select-Object -First 1
+                        }
                     }
                 }
 

@@ -8,7 +8,7 @@
       {
         "ObjectType": "SCOPE",
         "Property": "organizationalUnit",
-        "Right": "CreateChild",
+        "Right": "CreateChild"
       }
     ]
   },
@@ -21,7 +21,7 @@
       {
         "ObjectType": "SCOPE",
         "Property": "organizationalUnit",
-        "Right": "DeleteChild",
+        "Right": "DeleteChild"
       }
     ]
   },
@@ -34,7 +34,7 @@
       {
         "ObjectType": "organizationalUnit",
         "Property": "@",
-        "Right": "Delete",
+        "Right": "Delete"
       }
     ]
   },
@@ -47,12 +47,12 @@
       {
         "ObjectType": "organizationalUnit",
         "Property": "ou",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       },
       {
         "ObjectType": "organizationalUnit",
         "Property": "name",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       }
     ]
   },
@@ -65,7 +65,7 @@
       {
         "ObjectType": "organizationalUnit",
         "Property": "description",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       }
     ]
   },
@@ -78,7 +78,7 @@
       {
         "ObjectType": "organizationalUnit",
         "Property": "managedBy",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       }
     ]
   },
@@ -91,7 +91,7 @@
       {
         "ObjectType": "organizationalUnit",
         "Property": "@",
-        "Right": "WriteDacl",
+        "Right": "WriteDacl"
       }
     ]
   }

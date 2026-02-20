@@ -8,22 +8,22 @@
       {
         "ObjectType": "SCOPE",
         "Property": "gPLink",
-        "Right": "ReadProperty",
+        "Right": "ReadProperty"
       },
       {
         "ObjectType": "SCOPE",
         "Property": "gPLink",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       },
       {
         "ObjectType": "SCOPE",
         "Property": "gPOptions",
-        "Right": "ReadProperty",
+        "Right": "ReadProperty"
       },
       {
         "ObjectType": "SCOPE",
         "Property": "gPOptions",
-        "Right": "WriteProperty",
+        "Right": "WriteProperty"
       }
     ]
   },
@@ -36,7 +36,7 @@
       {
         "ObjectType": "SCOPE",
         "Property": "Generate Resultant Set of Policy (Planning)",
-        "Right": "ExtendedRight",
+        "Right": "ExtendedRight"
       }
     ]
   },
@@ -49,7 +49,7 @@
       {
         "ObjectType": "SCOPE",
         "Property": "Generate Resultant Set of Policy (Logging)",
-        "Right": "ExtendedRight",
+        "Right": "ExtendedRight"
       }
     ]
   }
