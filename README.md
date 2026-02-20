@@ -193,12 +193,13 @@ Each JSON file contains an array of templates:
 ```json
 [
   {
-    "ID": 101,
+    "ID": "101",
     "Description": "User: read & write all properties",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "SCOPE,user",
     "Template": [
-      { "Class": "user", "Property": "@",              "Right": "ReadProperty|WriteProperty" },
-      { "Class": "user", "Property": "Reset Password", "Right": "ExtendedRight" }
+      { "ObjectType": "user", "Property": "@",              "Right": "ReadProperty|WriteProperty" },
+      { "ObjectType": "user", "Property": "Reset Password", "Right": "ExtendedRight" }
     ]
   }
 ]
@@ -206,11 +207,12 @@ Each JSON file contains an array of templates:
 
 | Key | Type | Description |
 |---|---|---|
-| `ID` | `int` | Unique template identifier |
+| `ID` | `string` | Unique template identifier |
 | `Description` | `string` | Human-readable description |
-| `AppliesTo` | `string` | Comma-separated AD object classes this template targets |
+| `AppliesToClasses` | `string` | Comma-separated AD object classes this template targets |
+| `ObjectTypes` | `string` | Comma-separated AD object classes this template applies permissions to |
 | `Template` | `array` | Array of permission rules |
-| `Template[].Class` | `string` | AD object class (e.g. `user`, `group`, `computer`, `scope`) |
+| `Template[].ObjectType` | `string` | AD object class (e.g. `user`, `group`, `computer`, `SCOPE`) |
 | `Template[].Property` | `string` | Property or extended right name (`@` = all properties) |
 | `Template[].Right` | `string` | Full `ActiveDirectoryRights` enum name(s) |
 
@@ -243,7 +245,7 @@ Each JSON file contains an array of templates:
 
 **Multiple rights per rule** are supported — separate with `|` or `,`:
 ```json
-{ "Class": "user", "Property": "@", "Right": "ReadProperty|WriteProperty" }
+{ "ObjectType": "user", "Property": "@", "Right": "ReadProperty|WriteProperty" }
 ```
 
 > Validation is case-insensitive. Invalid `Right` values produce a clear warning listing all allowed enum names.
@@ -254,7 +256,7 @@ Each JSON file contains an array of templates:
 
 | Problem | Solution |
 |---|---|
-| Template is skipped | Check the warning message — it tells you whether `Right`, `Class`, or `Property` is invalid |
+| Template is skipped | Check the warning message — it tells you whether `Right`, `ObjectType`, or `Property` is invalid |
 | JSON parse error | Validate syntax: `Get-Content .\templates\100-user.json -Raw \| ConvertFrom-Json` |
 | "No template with ID X found" | Run `-ShowTemplates` to verify the ID exists and is loaded |
 | "Template path not found" | Verify `-TemplatePath` points to an existing file or directory |
@@ -268,6 +270,9 @@ Each JSON file contains an array of templates:
 |---|---|
 | `Revert-ADDelegationTemplate.ps1` | Revert previously applied permissions using a log file |
 | `Show-ADDelegationTemplateChanges.ps1` | Display logged permission changes (formatted or raw) |
+| `tools\ConvertFrom-DelegwizToTemplate.ps1` | Convert legacy `delegwiz.ini` files to JSON templates |
+| `tools\ConvertFrom-ObjectAclToTemplate.ps1` | Reverse-engineer: generate a template from existing AD permissions |
+| `tools\Test-DelegationTemplate.ps1` | Validate a JSON template against the AD schema |
 
 ---
 

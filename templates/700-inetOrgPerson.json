@@ -1,61 +1,59 @@
 [
   {
-    "ID": 500,
+    "ID": "700",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Create, delete, and manage inetOrgPerson accounts",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "SCOPE,inetOrgPerson",
     "Template": [
       {
-        "Property": "@",
-        "Class": "inetOrgPerson",
-        "Right": "ReadProperty"
-      },
-      {
-        "Property": "@",
-        "Class": "inetOrgPerson",
-        "Right": "WriteProperty"
-      },
-      {
+        "ObjectType": "SCOPE",
         "Property": "inetOrgPerson",
-        "Class": "scope",
         "Right": "CreateChild"
       },
       {
+        "ObjectType": "SCOPE",
         "Property": "inetOrgPerson",
-        "Class": "scope",
         "Right": "DeleteChild"
+      },
+      {
+        "ObjectType": "inetOrgPerson",
+        "Property": "@",
+        "Right": "GenericAll"
       }
     ]
   },
   {
-    "ID": 501,
+    "ID": "701",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Reset inetOrgPerson passwords and force password change at next logon",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "inetOrgPerson",
     "Template": [
       {
+        "ObjectType": "inetOrgPerson",
         "Property": "Reset Password",
-        "Class": "inetOrgPerson",
         "Right": "ExtendedRight"
       },
       {
+        "ObjectType": "inetOrgPerson",
         "Property": "pwdLastSet",
-        "Class": "inetOrgPerson",
         "Right": "ReadProperty"
       },
       {
+        "ObjectType": "inetOrgPerson",
         "Property": "pwdLastSet",
-        "Class": "inetOrgPerson",
         "Right": "WriteProperty"
       }
     ]
   },
   {
-    "ID": 502,
+    "ID": "702",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Read all inetOrgPerson information",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "inetOrgPerson",
     "Template": [
       {
+        "ObjectType": "inetOrgPerson",
         "Property": "@",
-        "Class": "inetOrgPerson",
         "Right": "ReadProperty"
       }
     ]

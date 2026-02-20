@@ -1,121 +1,131 @@
 [
   {
-    "ID": 300,
+    "ID": "300",
+    "AppliesToClasses": "domainDNS",
     "Description": "Join a computer to the domain",
-    "AppliesTo": "domainDNS",
+    "ObjectTypes": "SCOPE",
     "Template": [
       {
+        "ObjectType": "SCOPE",
         "Property": "computer",
-        "Class": "scope",
-        "Right": "CreateChild"
+        "Right": "CreateChild",
       }
     ]
   },
   {
-    "ID": 301,
+    "ID": "301",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Create a computer account",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "SCOPE",
     "Template": [
       {
+        "ObjectType": "SCOPE",
         "Property": "computer",
-        "Class": "scope",
-        "Right": "CreateChild"
+        "Right": "CreateChild",
       }
     ]
   },
   {
-    "ID": 302,
+    "ID": "302",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Delete a child computer account",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "SCOPE",
     "Template": [
       {
+        "ObjectType": "SCOPE",
         "Property": "computer",
-        "Class": "scope",
-        "Right": "DeleteChild"
+        "Right": "DeleteChild",
       }
     ]
   },
   {
-    "ID": 303,
+    "ID": "303",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Delete this computer account",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "computer",
     "Template": [
       {
+        "ObjectType": "computer",
         "Property": "@",
-        "Class": "computer",
-        "Right": "Self"
+        "Right": "Delete",
       }
     ]
   },
   {
-    "ID": 304,
+    "ID": "304",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Rename a computer account",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "computer",
     "Template": [
       {
+        "ObjectType": "computer",
         "Property": "@",
-        "Class": "computer",
-        "Right": "WriteProperty"
+        "Right": "WriteProperty",
       }
     ]
   },
   {
-    "ID": 305,
+    "ID": "305",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Disable a computer account",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "computer",
     "Template": [
       {
+        "ObjectType": "computer",
         "Property": "userAccountControl",
-        "Class": "computer",
-        "Right": "WriteProperty"
+        "Right": "WriteProperty",
       }
     ]
   },
   {
-    "ID": 306,
+    "ID": "306",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Reset a computer account",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "computer",
     "Template": [
       {
+        "ObjectType": "computer",
         "Property": "Reset Password",
-        "Class": "computer",
-        "Right": "ExtendedRight"
+        "Right": "ExtendedRight",
       }
     ]
   },
   {
-    "ID": 307,
-    "Description": "Specify the computer`s description",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ID": "307",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Specify the computer's description",
+    "ObjectTypes": "computer",
     "Template": [
       {
+        "ObjectType": "computer",
         "Property": "description",
-        "Class": "computer",
-        "Right": "WriteProperty"
+        "Right": "WriteProperty",
       }
     ]
   },
   {
-    "ID": 308,
+    "ID": "308",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Specify Managed-By information for a computer account",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "computer",
     "Template": [
       {
+        "ObjectType": "computer",
         "Property": "managedBy",
-        "Class": "computer",
-        "Right": "WriteProperty"
+        "Right": "WriteProperty",
       }
     ]
   },
   {
-    "ID": 309,
+    "ID": "309",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Specify that a computer account be trusted for delegation",
-    "AppliesTo": "domainDNS,organizationalUnit,container",
+    "ObjectTypes": "computer",
     "Template": [
       {
+        "ObjectType": "computer",
         "Property": "userAccountControl",
-        "Class": "computer",
-        "Right": "WriteProperty"
+        "Right": "WriteProperty",
       }
     ]
   }

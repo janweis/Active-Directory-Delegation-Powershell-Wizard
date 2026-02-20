@@ -5,8 +5,9 @@
 
     .DESCRIPTION
     This script allows you to apply predefined delegation templates to Active Directory objects, granting specific permissions based
-    on the rules defined in the templates. Templates are defined in external JSON files, which can be loaded from a specified path. 
-    The script also supports listing available templates and logging applied changes for auditing purposes.
+    on the rules defined in the templates. Templates are defined in external JSON files, which can be loaded from a specified path or 
+    are automatically loaded from a 'templates' subdirectory. The script dynamically resolves AD schema GUIDs, supports full 
+    ActiveDirectoryRights enum names, and logs applied changes for auditing and rollback purposes.
 
     .AUTHOR 
     Jan Weis
@@ -16,19 +17,20 @@
 
     .NOTES
     v1.3-dev Changelog:
-    + [NEW] Import external templates from JSON (Import-ExternalTemplates)
-    + [NEW] Validate-DelegationTemplateStructure (schema validation with warnings)
-    + [IMPROVE] Show-Templates now displays Origin/SourceFile
-    + [IMPROVE] Safer merge logic for external templates (last-writer-wins)
-    + [DOC] Added templates/README and generated example JSON files
-    + [FIX] Improved error handling and logging for template loading and validation
-    + [FIX] Corrected handling of Rights parsing and validation (expecting full enum names)
-    + [FIX] Added support for both single object and array formats in JSON template files
+    + [NEW] Completely externalized templates to JSON files (no hardcoded templates in script).
+    + [NEW] Auto-loader for templates from a 'templates' subdirectory.
+    + [NEW] Dynamic AD Schema resolution (Get-ObjectTypeGUID) replaces hardcoded GUID mapping tables.
+    + [NEW] Support for full ActiveDirectoryRights enum names (e.g., ReadProperty, ExtendedRight) and multiple rights per rule.
+    + [IMPROVE] Show-Templates now displays Origin/SourceFile and uses color coding.
+    + [IMPROVE] Safer merge logic for external templates (last-writer-wins on duplicate IDs).
+    + [IMPROVE] Enhanced logging format (semicolon-separated) for better compatibility with Revert-ADDelegationTemplate.
+    + [DOC] Added templates/README and generated example JSON files.
+    + [FIX] Removed legacy abbreviations (RP, WP, CC, etc.) in favor of standard .NET enums.
 
-    .PARAMETER AdIdentity
+    .PARAMETER Identity
     Identity reference (name, SID or AD object) that will receive permissions.
 
-    .PARAMETER AdObjectPathDN
+    .PARAMETER Path
     Target Organizational Unit or AD object in distinguishedName format.
 
     .PARAMETER TemplateIDs
@@ -36,7 +38,7 @@
 
     .PARAMETER TemplatePath
     Path to a JSON file or a directory containing external delegation templates. **This parameter is required** — the script contains no built-in templates; always provide `-TemplatePath` to load templates.
-    Template rule `Right` must use full ActiveDirectoryRights enum names (for example: `ReadProperty`, `WriteProperty`, `ExtendedRight`). Abbreviations (for example `RP`, `WP`, `CONTROLRIGHT`) are no longer accepted.
+    Template permissionTemplate `Right` must use full ActiveDirectoryRights enum names (for example: `ReadProperty`, `WriteProperty`, `ExtendedRight`). Abbreviations (for example `RP`, `WP`, `CONTROLRIGHT`) are no longer accepted.
     If a directory is provided, all *.json files are loaded alphabetically and merged (external entries override templates by ID).
 
     .PARAMETER LogChanges
@@ -49,7 +51,7 @@
     Show a list of templates that can be applied.
 
     .PARAMETER IncludeDetails
-    When used with -ShowTemplates, display rule details and the source file.
+    When used with -ShowTemplates, display permissionTemplate details and the source file.
 
     .EXAMPLE
     # List available templates 
@@ -59,15 +61,15 @@
     Invoke-ADDelegationTemplate -TemplatePath .\templates -ShowTemplates -IncludeDetails
 
     # Apply template 101 to an OU for a group identity and log changes
-    Invoke-ADDelegationTemplate -AdIdentity 'CN=UserManagers,OU=Groups,DC=contoso,DC=local' -AdObjectPathDN 'OU=MyOU,DC=contoso,DC=local' -TemplateIDs 101 -LogChanges -LogPath .\delegation.log
+    Invoke-ADDelegationTemplate -Identity 'CN=UserManagers,OU=Groups,DC=contoso,DC=local' -Path 'OU=MyOU,DC=contoso,DC=local' -TemplateIDs 101 -LogChanges -LogPath .\delegation.log
 #>
 [CmdletBinding()]
 param (
     [Parameter(Mandatory, ParameterSetName = 'DoTheMagic')]
-    [string]$AdIdentity,
+    [string]$Identity,
 
     [Parameter(Mandatory, ParameterSetName = 'DoTheMagic')]
-    [string]$AdObjectPathDN,
+    [string]$Path,
 
     [Parameter(Mandatory, ParameterSetName = 'DoTheMagic')]
     [int[]]$TemplateIDs,
@@ -81,7 +83,7 @@ param (
     [Parameter(ParameterSetName = 'DoTheMagic')]
     [string]$LogPath,
 
-    [Parameter(ParameterSetName = 'Viewer')]
+    [Parameter(Mandatory, ParameterSetName = 'Viewer')]
     [switch]$ShowTemplates,
 		
     [Parameter(ParameterSetName = 'Viewer')]
@@ -91,58 +93,6 @@ param (
 begin {
     Write-Verbose -Message '[Invoke-ADDelegationTemplate] START'
 
-    #
-    # Constants and Mappings
-    #
-
-    # GUIDs for Classes
-    $classGuidsMap = @{
-        'scope'              = '0' # Scope Object (Used for Create Child and Delete Child Rights)
-        'user'               = 'bf967aba-0de6-11d0-a285-00aa003049e2' # User Object
-        'group'              = 'bf967a9c-0de6-11d0-a285-00aa003049e2' # Group Object
-        'computer'           = 'bf967a86-0de6-11d0-a285-00aa003049e2' # Computer Object
-        'organizationalUnit' = 'bf967aa5-0de6-11d0-a285-00aa003049e2' # Organizational Unit Object
-        'inetOrgPerson'      = '4828cc14-1437-45bc-9b07-ad6f015e5f28' # inetOrgPerson Object
-        'msWMI-Som'          = '17b8b2f3-35e1-4c7c-b9b0-dba7750c9e4d' # WMI-Filter
-        'gPLink'             = 'f30e3bbe-9ff0-11d1-b603-0000f80367c1' # Group Policy Link
-        'gPOptions'          = 'f30e3bbf-9ff0-11d1-b603-0000f80367c1' # Group Policy Options
-    }
-        
-    # GUIDS for Class Properties & ControlRights
-    $propertyGuidsMap = @{
-        '@'                                           = '0' # Special value for "@" meaning "all properties" (used for class-level permissions)
-        'Reset Password'                              = '00299570-246d-11d0-a768-00aa006e0529'
-        'Change Password'                             = 'ab721a53-1e2f-11d0-9819-00aa0040529b'
-        'Generate Resultant Set of Policy (Logging)'  = 'b7b1b3de-ab09-4242-9e30-9980e5d322f7'
-        'Generate Resultant Set of Policy (Planning)' = 'b7b1b3dd-ab09-4242-9e30-9980e5d322f7'
-        'cn'                                          = 'bf96793f-0de6-11d0-a285-00aa003049e2'
-        'name'                                        = 'bf967a0e-0de6-11d0-a285-00aa003049e2'
-        'displayName'                                 = 'bf967953-0de6-11d0-a285-00aa003049e2'
-        'sAMAccountName'                              = '3e0abfd0-126a-11d0-a060-00aa006c33ed'
-        'userAccountControl'                          = 'bf967a68-0de6-11d0-a285-00aa003049e2'
-        'description'                                 = 'bf967950-0de6-11d0-a285-00aa003049e2'
-        'info'                                        = 'bf96793e-0de6-11d0-a285-00aa003049e2'
-        'managedBy'                                   = '0296c120-40da-11d1-a9c0-0000f80367c1'
-        'telephoneNumber'                             = 'bf967a49-0de6-11d0-a285-00aa003049e2'
-        'wWWHomePage'                                 = 'bf967a7a-0de6-11d0-a285-00aa003049e2'
-        'userPrincipalName'                           = '28630ebb-41d5-11d1-a9c1-0000f80367c1'
-        'accountExpires'                              = 'bf967915-0de6-11d0-a285-00aa003049e2'
-        'lockoutTime'                                 = '28630ebf-41d5-11d1-a9c1-0000f80367c1'
-        'pwdLastSet'                                  = 'bf967a0a-0de6-11d0-a285-00aa003049e2'
-        'physicalDeliveryOfficeName'                  = 'bf9679f7-0de6-11d0-a285-00aa003049e2'
-        'logonHours'                                  = 'bf9679ab-0de6-11d0-a285-00aa003049e2'
-        'userWorkstations'                            = 'bf9679d7-0de6-11d0-a285-00aa003049e2'
-        'profilePath'                                 = 'bf967a05-0de6-11d0-a285-00aa003049e2'
-        'scriptPath'                                  = 'bf9679a8-0de6-11d0-a285-00aa003049e2'
-        'ou'                                          = 'bf9679f0-0de6-11d0-a285-00aa003049e2'
-        'member'                                      = 'bf9679c0-0de6-11d0-a285-00aa003049e2'
-        'groupClass'                                  = '9a9a021e-4a5b-11d1-a9c3-0000f80367c1'
-        'userPassword'                                = 'bf967a6e-0de6-11d0-a285-00aa003049e2'
-        'adminDisplayName'                            = 'bf96791a-0de6-11d0-a285-00aa003049e2'
-        'distinguishedName'                           = 'bf9679e4-0de6-11d0-a285-00aa003049e2'
-    }
-        
-        
     #
     # Configuration and Initialization
     #
@@ -163,6 +113,51 @@ begin {
     # Functions
     #
 
+    # Get ObjectType GUID from Schema or Extended Rights or schmema class name
+    function Get-ObjectTypeGUID {
+        param (
+            [Parameter(Mandatory = $true, HelpMessage = "Specify the ObjectType name to look up")]
+            [string]$Name,
+
+            [Parameter(Mandatory = $true)]
+            [ValidateSet("Schema", "ExtendedRights")]
+            [string]$GuidStore
+        )
+
+        $propertyName = if ($GuidStore -eq "ExtendedRights") { 'rightsGuid' } else { 'schemaIDGuid' }
+        If ($GuidStore -eq "ExtendedRights") {
+            $searchParams = @{
+                SearchBase = ('CN=Extended-Rights,' + (Get-ADRootDSE).configurationNamingContext)
+                LDAPFilter = "(DisplayName=$Name)"
+                Properties = $propertyName
+            }
+        }
+        else {
+            $searchParams = @{
+                SearchBase = (Get-ADRootDSE).schemaNamingContext
+                LDAPFilter = "(lDAPDisplayName=$Name)"
+                Properties = $propertyName
+            }
+        }
+
+        try {
+            $schemaObject = Get-ADObject @searchParams
+
+            if ($schemaObject) {
+                return ($schemaObject.$propertyName -as [Guid])
+            }
+            else {
+                Write-Warning "No schema object found for ObjectType name: $Name."
+                return $null
+            }
+        }
+        catch {
+            Write-Warning "Could not retrieve ObjectType GUID for name: $Name."
+            return $null
+        }
+    }
+
+    # Import the external templates from JSON file(s) and return an array of template objects with SourceFile property for traceability
     function Import-ExternalTemplates {
         <#
                 .SYNOPSIS
@@ -257,139 +252,6 @@ begin {
         return $loaded
     }
 
-    function Test-ExternalTemplateStructure {
-        <#
-                .SYNOPSIS
-                Validate shape and values of an external delegation template object.
-                Returns $true when valid, otherwise $false and emits warnings.
-            #>
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-            $Template,
-
-            [hashtable]
-            $ClassMap = $(if (Get-Variable -Name classGuidsMap -Scope 1 -ErrorAction SilentlyContinue) { (Get-Variable -Name classGuidsMap -Scope 1).Value } else { $null }),
-
-            [hashtable]
-            $PropertyMap = $(if (Get-Variable -Name propertyGuidsMap -Scope 1 -ErrorAction SilentlyContinue) { (Get-Variable -Name propertyGuidsMap -Scope 1).Value } else { $null })
-        )
-
-        $isValid = $true
-
-        if ($null -eq $Template.ID) {
-            Write-Warning "Template is missing property 'ID'."
-            return $false
-        }
-
-        try { $id = [int]$Template.ID } catch {
-            Write-Warning "Template ID '$($Template.ID)' is not an integer."
-            return $false
-        }
-
-        if (-not $Template.Template) {
-            Write-Warning "Template ID $($id): property 'Template' is missing or empty."
-            return $false
-        }
-
-        $rules = $Template.Template
-        if (-not ($rules -is [System.Collections.IEnumerable]) -or ($rules -is [string])) { $rules = , $rules }
-
-        foreach ($rule in $rules) {
-            if (-not $rule.Class) {
-                Write-Warning "Template ID $($id): a rule is missing 'Class'."
-                $isValid = $false
-                continue
-            }
-
-            if (-not $ClassMap -or -not $ClassMap.ContainsKey($rule.Class)) {
-                Write-Warning "Template ID $($id): unknown Class '$($rule.Class)'."
-                $isValid = $false
-                continue
-            }
-
-            if (-not $rule.Property) {
-                Write-Warning "Template ID $($id): a rule is missing 'Property'."
-                $isValid = $false
-                continue
-            }
-
-            $propValid = $false
-            if ($rule.Property -eq '@') { $propValid = $true }
-            elseif ($PropertyMap -and $PropertyMap.ContainsKey($rule.Property)) { $propValid = $true }
-            elseif ($ClassMap.ContainsKey($rule.Property)) { $propValid = $true }
-
-            if (-not $propValid) {
-                Write-Warning "Template ID $($id): unknown Property '$($rule.Property)'."
-                $isValid = $false
-                continue
-            }
-
-            if (-not $rule.Right) {
-                Write-Warning "Template ID $($id): a rule is missing 'Right'."
-                $isValid = $false
-                continue
-            }
-
-            # Validate Right(s) — expect full System.DirectoryServices.ActiveDirectoryRights names
-            # Support comma or '|' separated lists and arrays; parsing is case-insensitive.
-            $rightsToCheck = @()
-            if ($rule.Right -is [System.Collections.IEnumerable] -and -not ($rule.Right -is [string])) {
-                $rightsToCheck = $rule.Right
-            }
-            else {
-                $rightsToCheck = ($rule.Right -split '[,|]') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }
-            }
-
-            $invalidRight = $null
-            foreach ($rt in $rightsToCheck) {
-                $parsed = $null
-                if (-not [System.Enum]::TryParse([System.DirectoryServices.ActiveDirectoryRights], $rt, $true, [ref]$parsed)) {
-                    $invalidRight = $rt
-                    break
-                }
-            }
-
-            if ($invalidRight) {
-                $allowed = ([Enum]::GetNames([System.DirectoryServices.ActiveDirectoryRights]) -join ', ')
-                Write-Warning "Template ID $($id): unknown Right '$($invalidRight)'. Allowed values: $allowed"
-                $isValid = $false
-                continue
-            }
-        }
-
-        return $isValid
-    }
-
-    # Convert template-specified rights (string or array) to a combined ActiveDirectoryRights enum value
-    function Convert-TemplateRightsToADRights {
-        param(
-            [Parameter(Mandatory = $true)]
-            $RightSpec
-        )
-
-        # Return a bitwise-combined System.DirectoryServices.ActiveDirectoryRights value
-        [System.DirectoryServices.ActiveDirectoryRights]$result = 0
-
-        $tokens = @()
-        if ($RightSpec -is [System.Collections.IEnumerable] -and -not ($RightSpec -is [string])) {
-            $tokens = $RightSpec
-        }
-        else {
-            $tokens = ($RightSpec -split '[,|]') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }
-        }
-
-        foreach ($t in $tokens) {
-            $parsed = $null
-            if (-not [System.Enum]::TryParse([System.DirectoryServices.ActiveDirectoryRights], $t, $true, [ref]$parsed)) {
-                throw "Invalid ActiveDirectoryRights value '$t'"
-            }
-            $result = $result -bor $parsed
-        }
-
-        return $result
-    }
-
     # Grant permissions to the AD object
     function Grant-AdPermission {
         param (
@@ -400,10 +262,10 @@ begin {
             [string]$ObjectPathDN,
                 
             [Parameter(Mandatory)]
-            [string]$ClassGUID,
+            [guid]$InheritedObjectType,
                 
             [Parameter(Mandatory)]
-            [string]$PropertyGUID,
+            [guid]$ObjectType,
                 
             [Parameter(Mandatory)]
             [System.DirectoryServices.ActiveDirectoryRights]$Rights,
@@ -426,37 +288,50 @@ begin {
         }
             
         # BUILD Access Control Entry 
-        if ($ClassGUID -eq 0) {
+        if ($InheritedObjectType -eq [guid]::Empty) {
+
             # SCOPE
+            # For scope entries, the InheritedObjectType is set to 0 and the ObjectType specifies the target class 
+            # (e.g., 'user', 'group') for Create Child/Delete Child rights. The ACE is created with ObjectType = ObjectType 
+            # and Inheritance = All.
             $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
                 [System.Security.Principal.NTAccount]$Identity, 
                 [System.DirectoryServices.ActiveDirectoryRights]$Rights,
                 [System.Security.AccessControl.AccessControlType]::Allow,
-                [GUID]$PropertyGUID,
+                
+                [GUID]$ObjectType,
                 [System.DirectoryServices.ActiveDirectorySecurityInheritance]::All
             )
         }
         else {
+            
             # CLASS
-            If ($PropertyGUID -eq 0) {
+            # For class-level permissions, the ACE is created with ObjectType = InheritedObjectType and Inheritance = Descendents. 
+            # If ObjectType is 0, it applies to the entire class; otherwise, it applies to the specific property.
+            If ($ObjectType -eq [guid]::Empty) {
                 # @
                 $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
                     [System.Security.Principal.NTAccount]$Identity, 
                     [System.DirectoryServices.ActiveDirectoryRights]$Rights,
                     [System.Security.AccessControl.AccessControlType]::Allow,
+                    
                     [System.DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
-                    [GUID]$ClassGUID
+                    [GUID]$InheritedObjectType
                 )
             }
             else {
+                
                 # PROPERTY
+                # For property-level permissions, the ACE is created with ObjectType = ObjectType and Inheritance = Descendents, 
+                # and the InheritedObjectType is specified in the ACE to indicate which class's property is being secured.
                 $ace = New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList (
                     [System.Security.Principal.NTAccount]$Identity, 
                     [System.DirectoryServices.ActiveDirectoryRights]$Rights,
                     [System.Security.AccessControl.AccessControlType]::Allow,
-                    [GUID]$PropertyGUID,
+                    
+                    [GUID]$ObjectType,
                     [System.DirectoryServices.ActiveDirectorySecurityInheritance]::Descendents,
-                    [GUID]$ClassGUID
+                    [GUID]$InheritedObjectType
                 )
             }
         }
@@ -464,7 +339,7 @@ begin {
         $adObject.ObjectSecurity.AddAccessRule($ace)    
         $adObject.CommitChanges()
             
-        $verboseMessage = "[*] Applied permission:`n`tADIdentity = $Identity,`n`tOU = $ObjectPathDN,`n`tRight = $Rights,`n`tObject Class GUID = $ClassGUID,`n`tProperty GUID = $PropertyGUID"
+        $verboseMessage = "[*] Applied permission:`n`tADIdentity = $Identity,`n`tOU = $ObjectPathDN,`n`tRight = $Rights,`n`tObject Class GUID = $InheritedObjectType,`n`tProperty GUID = $ObjectType"
         Write-Verbose -Message $verboseMessage
     }
 
@@ -491,8 +366,8 @@ begin {
                 }
                 if ($template.Template) {
                     Write-Host "   Rules:"
-                    foreach ($rule in $template.Template) {
-                        Write-Host "`tClass: $($rule.Class) | Property: $($rule.Property) | Right: $($rule.Right)"
+                    foreach ($permissionTemplate in $template.Template) {
+                        Write-Host "`tClass: $($permissionTemplate.Class) | Property: $($permissionTemplate.Property) | Right: $($permissionTemplate.Right)"
                     }
                 }
 
@@ -521,8 +396,8 @@ begin {
             [Parameter(Mandatory)]
             [System.DirectoryServices.ActiveDirectoryRights]$Rights,
 
-            [string]$ClassGUID = $null,
-            [string]$PropertyGUID = $null,
+            [string]$InheritedObjectType = $null,
+            [string]$ObjectType = $null,
             [string]$AppliesTo = $null
         )
 
@@ -530,7 +405,7 @@ begin {
         $currentTime = (Get-Date).ToShortTimeString()
             
         # Datum, Uhrzeit, TemplateID, OU, Identity, Permisson, ObjectClass, Property,
-        $fileData = "$currentDate;$currentTime;$TemplateID;$ObjectPathDN;$Identity;$Rights;$ClassGUID;$PropertyGUID;"
+        $fileData = "$currentDate;$currentTime;$TemplateID;$ObjectPathDN;$Identity;$Rights;$InheritedObjectType;$ObjectType;"
 
         try {
             Out-File -FilePath $LogFilePath -InputObject $fileData -Encoding utf8 -Append -NoClobber | Out-Null
@@ -540,9 +415,10 @@ begin {
         }
     }
 
-    # Load Delegation Templates
+    # Load Templates
     $importedTemplates = @()
     if ($AutoTemplatesLoader -and -not $TemplatePath) {
+        # Autoloader
 
         if (Test-Path -LiteralPath $AutoTemplatesPath) {
             Write-Verbose "[Invoke-ADDelegationTemplate] Auto-loading templates from '$AutoTemplatesPath'"
@@ -559,6 +435,7 @@ begin {
         }
     }
     else {
+        # Path-Loader
 
         Write-Verbose "[Invoke-ADDelegationTemplate] Loading external templates from '$TemplatePath'"
         try {
@@ -570,10 +447,6 @@ begin {
     }
 
     foreach ($templateItem in $importedTemplates) {
-        if (-not (Test-ExternalTemplateStructure -Template $templateItem -ClassMap $classGuidsMap -PropertyMap $propertyGuidsMap)) {
-            Write-Warning "[Invoke-ADDelegationTemplate] template ID $($templateItem.ID) from '$($templateItem.SourceFile)' failed validation and was skipped."
-            continue
-        }
 
         # Remove any existing entries with the same ID and append the external template (last-writer-wins)
         $existingCount = ($delegationTemplates | Where-Object { $_.ID -eq $templateItem.ID }).Count
@@ -585,7 +458,6 @@ begin {
         $delegationTemplates += $templateItem
         Write-Verbose "[Invoke-ADDelegationTemplate] template ID $($templateItem.ID) from '$($templateItem.SourceFile)' merged (appended)."
     }
-    
 }
     
 process {
@@ -613,7 +485,8 @@ process {
                 
             # Get Template
             $selectedTemplate = $delegationTemplates | Where-Object { $_.ID -eq $templateID } 
-                
+            Write-Verbose -Message "Selected template for ID $templateID - '$($selectedTemplate.Description)' from source '$($selectedTemplate.SourceFile)'"
+
             if ($null -eq $selectedTemplate) {
                 # No Template found!
                 Write-Warning -Message "No template with ID $($templateID.ToString()) found!"
@@ -622,24 +495,58 @@ process {
             }                
                 
             # Apply multiple template Permission Rules
-            Foreach ($rule in $selectedTemplate.Template) {
-                
-                # Mapping Name to GUID
-                $propertyGUID = ''
-                if ($rule.Class -like 'scope') {
-                    $propertyGUID = $classGuidsMap[$rule.Property]
+            Foreach ($permissionTemplate in $selectedTemplate.Template) {
+                Write-Verbose -Message "Applying permission rule for ObjectType '$($permissionTemplate.ObjectType)' and Property '$($permissionTemplate.Property)'"
+
+                #
+                # Mapping ObjectType 
+                #
+
+                if ($permissionTemplate.ObjectType -like 'scope') {
+                    # Permission is set to a container
+                    $inheritedObjectType = [guid]::Empty
+                }
+                elseif ($permissionTemplate.ObjectType -match '^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$') {
+                    # ObjectType is already a GUID, use it directly
+                    $inheritedObjectType = $permissionTemplate.ObjectType
                 }
                 else {
-                    $propertyGUID = $propertyGuidsMap[$rule.Property]
+                    # ObjectType is a class name, look up the corresponding GUID in the schema
+                    $inheritedObjectType = Get-ObjectTypeGUID -Name $permissionTemplate.ObjectType -GuidStore 'Schema'
                 }
-                
+
+                #
+                # Mapping Property to GUID
+                #
+
+                $ObjectType = ''
+                if ($permissionTemplate.Property -eq '@') {
+                    # Use empty GUID to indicate the entire class for property-level permissions
+                    $ObjectType = [guid]::Empty
+                }
+                elseif ($permissionTemplate.Property -match '^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$') {
+                    # Property is already a GUID, use it directly
+                    $ObjectType = $permissionTemplate.Property
+                }
+                else {
+                    if($permissionTemplate.Right -match 'ExtendedRight') {
+                        # For Extended Rights, we need to look up the rightsGuid instead of ObjectGUID
+                        $ObjectType = Get-ObjectTypeGUID -Name $permissionTemplate.Property -GuidStore 'ExtendedRights'
+                    }
+                    else {
+                        # For regular properties, we look up the ObjectGUID in the schema
+                        $ObjectType = Get-ObjectTypeGUID -Name $permissionTemplate.Property -GuidStore 'Schema'
+                    }
+                }
+
+                # Create parameters for Grant-AdPermission function
                 $params = @{
-                    'Identity'     = $AdIdentity
-                    'ObjectPathDN' = $AdObjectPathDN
-                    'ClassGUID'    = $classGuidsMap[$rule.Class]
-                    'PropertyGUID' = $propertyGUID
-                    'Right'        = Convert-TemplateRightsToADRights $rule.Right
-                    'AppliesTo'    = $selectedTemplate.AppliesTo
+                    'Identity'            = $Identity
+                    'ObjectPathDN'        = $Path
+                    'InheritedObjectType' = $inheritedObjectType
+                    'ObjectType'          = $ObjectType
+                    'Right'               = $permissionTemplate.Right
+                    'AppliesTo'           = $selectedTemplate.AppliesTo
                 }
                 
                 # Set Permissions to Object
@@ -649,9 +556,9 @@ process {
                 if ($LogChanges) {
                     Write-PermissionChangesToLog -TemplateID $templateID -LogFilePath $LogPath @params
                 }
-
-                Write-Verbose -Message "[info] Template $templateID applied successfully."
             }
+            
+            Write-Verbose -Message "[info] Template $templateID applied successfully."
         }
     }
     catch {

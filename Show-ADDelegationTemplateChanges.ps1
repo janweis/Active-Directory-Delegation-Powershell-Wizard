@@ -43,6 +43,8 @@ function Show-ADDelegationTemplateChanges {
         
             return $logList
         }
+    
+        Write-Verbose -Message "Reading delegation template changes from log file: $LogFilePath"
     }
     
     process {
@@ -50,18 +52,14 @@ function Show-ADDelegationTemplateChanges {
         # Get Log entries
         $entries = Read-PermissionChangesFromLog -LogFilePath $LogFilePath
 
-        # Formattet Output
-        Format-Table -InputObject $entries -AutoSize -Property @{label="Date";Expression={$_.Date}}, @{label="Time";Expression={$_.Time}}, `
-            @{label="TemplateID";Expression={$_.TemplateID}}, @{label="OrganizationalUnit";Expression={$_.OrganizationalUnitDN}}, `
-            @{label="Identity";Expression={$_.Identity}}, @{label="Rights";Expression={$_.Rights}}, @{label="ObjectTypeGUID";Expression={$_.ObjectTypeGUID}}, `
-            @{label="PropertyGUID";Expression={$_.PropertyGUID}}, @{label="ControlRight";Expression={$_.ControlRight}}
+        # Formatted Output
+        Format-Table -InputObject $entries -AutoSize -Property @{label = "Date"; Expression = { $_.Date } }, @{label = "Time"; Expression = { $_.Time } }, `
+        @{label = "TemplateID"; Expression = { $_.TemplateID } }, @{label = "OrganizationalUnit"; Expression = { $_.OrganizationalUnitDN } }, `
+        @{label = "Identity"; Expression = { $_.Identity } }, @{label = "Rights"; Expression = { $_.Rights } }, @{label = "ObjectTypeGUID"; Expression = { $_.ObjectTypeGUID } }, `
+        @{label = "PropertyGUID"; Expression = { $_.PropertyGUID } }, @{label = "ControlRight"; Expression = { $_.ControlRight } }
     }
     
     end {
-        
+        Write-Verbose -Message "Finished processing log file: $LogFilePath"
     }
 }
-
-
-
-
