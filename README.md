@@ -15,17 +15,17 @@ Apply, audit, and revert permissions — consistently, transparently, and in sec
 
 # 2. Apply template 101 to an OU
 .\Invoke-ADDelegationTemplate.ps1 `
-  -AdIdentity    "Contoso\Helpdesk-Berlin" `
-  -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
-  -TemplateIDs   101 `
-  -TemplatePath  .\templates
+  -Identity    "Contoso\Helpdesk-Berlin" `
+  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateIDs 101 `
+  -TemplatePath .\templates
 
 # 3. Apply with change logging (for easy rollback)
 .\Invoke-ADDelegationTemplate.ps1 `
-  -AdIdentity    "Contoso\Helpdesk-Berlin" `
-  -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
-  -TemplateIDs   101,102 `
-  -TemplatePath  .\templates `
+  -Identity    "Contoso\Helpdesk-Berlin" `
+  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateIDs 101,102 `
+  -TemplatePath .\templates `
   -LogChanges `
   -LogPath "$env:USERPROFILE\DelegationLog.log"
 ```
@@ -46,8 +46,8 @@ Apply, audit, and revert permissions — consistently, transparently, and in sec
 
 | Parameter | Type | Description |
 |---|---|---|
-| `-AdIdentity` | `string` | AD principal (user/group) receiving the permissions |
-| `-AdObjectPathDN` | `string` | Target object in distinguishedName format (e.g. an OU) |
+| `-Identity` | `string` | AD principal (user/group) receiving the permissions |
+| `-Path` | `string` | Target object in distinguishedName format (e.g. an OU) |
 | `-TemplateIDs` | `int[]` | One or more template IDs to apply |
 | `-TemplatePath` | `string` | Path to a JSON file **or** a directory of JSON files |
 | `-ShowTemplates` | `switch` | List all loaded templates |
@@ -76,27 +76,27 @@ Apply, audit, and revert permissions — consistently, transparently, and in sec
 ```powershell
 # Single template
 .\Invoke-ADDelegationTemplate.ps1 `
-  -AdIdentity    "Helpdesk-Team" `
-  -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
-  -TemplateIDs   102 `
-  -TemplatePath  .\templates
+  -Identity    "Helpdesk-Team" `
+  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateIDs 102 `
+  -TemplatePath .\templates
 
 # Multiple templates at once
 .\Invoke-ADDelegationTemplate.ps1 `
-  -AdIdentity    "Helpdesk-Team" `
-  -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
-  -TemplateIDs   101,102,103 `
-  -TemplatePath  .\templates
+  -Identity    "Helpdesk-Team" `
+  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateIDs 101,102,103 `
+  -TemplatePath .\templates
 ```
 
 ### Apply with change logging
 
 ```powershell
 .\Invoke-ADDelegationTemplate.ps1 `
-  -AdIdentity    "Helpdesk-Team" `
-  -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
-  -TemplateIDs   102 `
-  -TemplatePath  .\templates `
+  -Identity    "Helpdesk-Team" `
+  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateIDs 102 `
+  -TemplatePath .\templates `
   -LogChanges `
   -LogPath "$env:USERPROFILE\DelegationLog.log"
 ```
@@ -152,10 +152,10 @@ The Berlin helpdesk team needs to reset user passwords in a specific OU:
 
 ```powershell
 .\Invoke-ADDelegationTemplate.ps1 `
-  -AdIdentity    "Contoso\Helpdesk-Berlin" `
-  -AdObjectPathDN "OU=UsersBerlin,DC=contoso,DC=local" `
-  -TemplateIDs   102 `
-  -TemplatePath  .\templates
+  -Identity    "Contoso\Helpdesk-Berlin" `
+  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateIDs 102 `
+  -TemplatePath .\templates
 ```
 
 ### Scenario 2 — Full user management with logging
@@ -164,10 +164,10 @@ Grant a team full user management rights and log every change:
 
 ```powershell
 .\Invoke-ADDelegationTemplate.ps1 `
-  -AdIdentity    "UserAdmins" `
-  -AdObjectPathDN "OU=Users,OU=Corp,DC=contoso,DC=local" `
-  -TemplateIDs   101,102,103 `
-  -TemplatePath  .\templates `
+  -Identity    "UserAdmins" `
+  -Path        "OU=Users,OU=Corp,DC=contoso,DC=local" `
+  -TemplateIDs 101,102,103 `
+  -TemplatePath .\templates `
   -LogChanges `
   -LogPath "$env:USERPROFILE\DelegationLog.log"
 ```
@@ -178,10 +178,10 @@ Allow a group to link/unlink GPOs on an OU:
 
 ```powershell
 .\Invoke-ADDelegationTemplate.ps1 `
-  -AdIdentity    "GPO-Managers" `
-  -AdObjectPathDN "OU=Sites,DC=contoso,DC=local" `
-  -TemplateIDs   601 `
-  -TemplatePath  .\templates
+  -Identity    "GPO-Managers" `
+  -Path        "OU=Sites,DC=contoso,DC=local" `
+  -TemplateIDs 601 `
+  -TemplatePath .\templates
 ```
 
 ---
