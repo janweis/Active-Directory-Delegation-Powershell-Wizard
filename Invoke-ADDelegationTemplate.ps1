@@ -1,4 +1,3 @@
-#requires -Version 3.0
 <#
     .SYNOPSIS
     Apply delegation templates (JSON-based) to Active Directory objects or list available templates.
@@ -9,13 +8,10 @@
     are automatically loaded from a 'templates' subdirectory. The script dynamically resolves AD schema GUIDs, supports full 
     ActiveDirectoryRights enum names, and logs applied changes for auditing and rollback purposes.
 
-    .AUTHOR 
-    Jan Weis
-    
-    .VERSION
-    v1.3-dev
-
     .NOTES
+    Author: Jan Weis
+    Version: v1.3-dev
+
     v1.3-dev Changelog:
     + [NEW] Completely externalized templates to JSON files (no hardcoded templates in script).
     + [NEW] Auto-loader for templates from a 'templates' subdirectory.
@@ -37,7 +33,7 @@
     One or more template IDs to apply (integer values from available templates).
 
     .PARAMETER TemplatePath
-    Path to a JSON file or a directory containing external delegation templates. **This parameter is required** — the script contains no built-in templates; always provide `-TemplatePath` to load templates.
+    Path to a JSON file or a directory containing external delegation templates. **This parameter is required** - the script contains no built-in templates; always provide `-TemplatePath` to load templates.
     Template permissionTemplate `Right` must use full ActiveDirectoryRights enum names (for example: `ReadProperty`, `WriteProperty`, `ExtendedRight`). Abbreviations (for example `RP`, `WP`, `CONTROLRIGHT`) are no longer accepted.
     If a directory is provided, all *.json files are loaded alphabetically and merged (external entries override templates by ID).
 
@@ -54,15 +50,27 @@
     When used with -ShowTemplates, display permissionTemplate details and the source file.
 
     .EXAMPLE
-    # List available templates 
     Invoke-ADDelegationTemplate -ShowTemplates -TemplatePath .\templates
+    
+    List all available delegation templates found in the '.\templates' directory.
 
-    # List available templates with details
-    Invoke-ADDelegationTemplate -TemplatePath .\templates -ShowTemplates -IncludeDetails
+    .EXAMPLE
+    Invoke-ADDelegationTemplate -ShowTemplates -TemplatePath .\templates -IncludeDetails
+    
+    List all available delegation templates with detailed permission rules and source file information.
 
-    # Apply template 101 to an OU for a group identity and log changes
-    Invoke-ADDelegationTemplate -Identity 'CN=UserManagers,OU=Groups,DC=contoso,DC=local' -Path 'OU=MyOU,DC=contoso,DC=local' -TemplateIDs 101 -LogChanges -LogPath .\delegation.log
-#>
+    .EXAMPLE
+    Invoke-ADDelegationTemplate -Identity 'MySpecialGroup' -Path 'OU=Workstations,DC=contoso,DC=com' -TemplateIDs 101 -TemplatePath .\templates
+    
+    Applies the delegation template with ID 101 to the 'Workstations' OU, granting permissions to the 'MySpecialGroup' group.
+
+    .EXAMPLE
+    Invoke-ADDelegationTemplate -Identity 'CONTOSO\Helpdesk' -Path 'OU=Users,DC=contoso,DC=com' -TemplateIDs 101, 102 -TemplatePath .\templates -LogChanges -LogPath C:\Logs\Delegation.log
+    
+    Applies templates 101 and 102 to the 'Users' OU for the 'Helpdesk' group, and logs all applied changes to 'C:\Logs\Delegation.log'.
+
+    #>
+#requires -Version 3.0
 [CmdletBinding()]
 param (
     [Parameter(Mandatory, ParameterSetName = 'DoTheMagic')]
@@ -89,7 +97,6 @@ param (
     [Parameter(ParameterSetName = 'Viewer')]
     [switch]$IncludeDetails
 )
-    
 begin {
     Write-Verbose -Message '[Invoke-ADDelegationTemplate] START'
 
@@ -124,6 +131,7 @@ begin {
             [string]$GuidStore
         )
 
+        # Setup search parameters based on the type of GUID being looked up (schema class vs extended right)
         $propertyName = if ($GuidStore -eq "ExtendedRights") { 'rightsGuid' } else { 'schemaIDGuid' }
         If ($GuidStore -eq "ExtendedRights") {
             $searchParams = @{
@@ -140,6 +148,7 @@ begin {
             }
         }
 
+        # Let's try to retrieve the schema object and extract the GUID property. 
         try {
             $schemaObject = Get-ADObject @searchParams
 
@@ -159,12 +168,6 @@ begin {
 
     # Import the external templates from JSON file(s) and return an array of template objects with SourceFile property for traceability
     function Import-ExternalTemplates {
-        <#
-                .SYNOPSIS
-                Import external delegation templates from a JSON file or directory of JSON files.
-                Returns an array of PSCustomObject templates with an added `SourceFile` property.
-            #>
-        [CmdletBinding()]
         param(
             [Parameter(Mandatory = $true, Position = 0)]
             [string]$Path
@@ -203,7 +206,7 @@ begin {
             }
 
             if ($null -eq $json) {
-                Write-Warning "File '$($file.FullName)' contains no JSON content — skipping."
+                Write-Warning "File '$($file.FullName)' contains no JSON content - skipping."
                 continue
             }
 
@@ -221,17 +224,17 @@ begin {
             $seenIds = @{}
             foreach ($template in $templatesInFile) {
                 if ($null -eq $template.ID) {
-                    Write-Warning "Template in file '$($file.Name)' missing property 'ID' — skipping."
+                    Write-Warning "Template in file '$($file.Name)' missing property 'ID' - skipping."
                     continue
                 }
 
                 try { $tid = [int]$template.ID } catch {
-                    Write-Warning "Template ID '$($template.ID)' in file '$($file.Name)' is not an integer — skipping."
+                    Write-Warning "Template ID '$($template.ID)' in file '$($file.Name)' is not an integer - skipping."
                     continue
                 }
 
                 if ($seenIds.ContainsKey($tid)) {
-                    Write-Warning "Duplicate template ID $tid in file '$($file.Name)' — skipping duplicate."
+                    Write-Warning "Duplicate template ID $tid in file '$($file.Name)' - skipping duplicate."
                     continue
                 }
 
@@ -344,8 +347,12 @@ begin {
     }
 
     # Show all templates
-    function Show-Templates([switch]$IncludeDetails) {
-            
+    function Show-Templates {
+        param (
+            [Parameter(HelpMessage = "Include permissionTemplate details and source file information in the output")]
+            [switch]$IncludeDetails
+        )
+
         for ($i = 0; $i -lt $delegationTemplates.Count; $i++) {
             $defaultColor = [ConsoleColor]::White
             $template = $delegationTemplates[$i]
@@ -379,7 +386,6 @@ begin {
 
     # Writes a Logging for Changes, to revert Changes easyly
     function Write-PermissionChangesToLog {
-        [CmdletBinding()]
         param (
             [Parameter(Mandatory)]
             [string]$LogFilePath,
@@ -529,7 +535,7 @@ process {
                     $ObjectType = $permissionTemplate.Property
                 }
                 else {
-                    if("ExtendedRight","Self" -contains $permissionTemplate.Right) {
+                    if ("ExtendedRight", "Self" -contains $permissionTemplate.Right) {
                         # For Extended Rights, we need to look up the rightsGuid instead of ObjectGUID
                         $ObjectType = Get-ObjectTypeGUID -Name $permissionTemplate.Property -GuidStore 'ExtendedRights' | Select-Object -First 1
                     }
@@ -575,3 +581,19 @@ process {
 end {
     Write-Verbose -Message '[Invoke-ADDelegationTemplate] END'
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
