@@ -162,12 +162,43 @@ $templateEntry.ObjectTypes = ($templateEntry.ObjectTypes | Sort-Object -Unique) 
 $json = $templateEntry | ConvertTo-Json -Depth 5
 
 if ($OutputPath) {
+
     if ($Append) {
-        Add-Content -Path $OutputPath -Value $json
+
+        $existingContent = $null
+        if (Test-Path -Path $OutputPath -PathType Leaf -ErrorAction SilentlyContinue) {
+            Write-Host "Appending new template entry to existing file at '$OutputPath'..." -ForegroundColor Green
+            $existingContent = Get-Content -Path $OutputPath -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json
+        }
+
+        $existingContent.GetType()
+        
+        if ($null -ne $existingContent) {
+            if ($existingContent -is [array]) {
+                # multiple entries...
+                
+                # Get latest ID from existing content to avoid duplicates
+                $maxID = ($existingContent | ForEach-Object { [int]$_.ID } | Measure-Object -Maximum).Maximum
+                $templateEntry.ID = $maxID + 1
+                
+                # Append the new template entry to the existing content
+                $existingContent += [PSCustomObject]$templateEntry
+                $json = $existingContent | ConvertTo-Json -Depth 5
+            }
+            else {
+                # single entry...
+
+                # Get latest ID from existing content to avoid duplicates
+                $maxID = [int]$existingContent.ID
+                $templateEntry.ID = $maxID + 1
+    
+                # Append the new template entry to the existing content
+                $json = @($existingContent, $templateEntry) | ConvertTo-Json -Depth 5
+            }
+        }
     }
-    else {
-        Set-Content -Path $OutputPath -Value $json
-    }
+
+    Set-Content -Path $OutputPath -Value $json -Encoding UTF8
 }
 
 return $json
