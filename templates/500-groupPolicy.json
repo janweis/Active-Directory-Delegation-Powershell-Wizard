@@ -1,0 +1,56 @@
+[
+  {
+    "ID": "500",
+    "AppliesToClasses": "domainDNS,organizationalUnit,site",
+    "Description": "Manage Group Policy links",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "gPLink",
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "SCOPE",
+        "Property": "gPLink",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "SCOPE",
+        "Property": "gPOptions",
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "SCOPE",
+        "Property": "gPOptions",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "501",
+    "AppliesToClasses": "domainDNS,organizationalUnit",
+    "Description": "Generate Resultant Set of Policy (Planning)",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "Generate Resultant Set of Policy (Planning)",
+        "Right": "ExtendedRight"
+      }
+    ]
+  },
+  {
+    "ID": "502",
+    "AppliesToClasses": "domainDNS,organizationalUnit",
+    "Description": "Generate Resultant Set of Policy (Logging)",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "Generate Resultant Set of Policy (Logging)",
+        "Right": "ExtendedRight"
+      }
+    ]
+  }
+]

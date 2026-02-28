@@ -1,0 +1,61 @@
+[
+  {
+    "ID": "700",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Create, delete, and manage inetOrgPerson accounts",
+    "ObjectTypes": "SCOPE,inetOrgPerson",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "inetOrgPerson",
+        "Right": "CreateChild"
+      },
+      {
+        "ObjectType": "SCOPE",
+        "Property": "inetOrgPerson",
+        "Right": "DeleteChild"
+      },
+      {
+        "ObjectType": "inetOrgPerson",
+        "Property": "@",
+        "Right": "GenericAll"
+      }
+    ]
+  },
+  {
+    "ID": "701",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Reset inetOrgPerson passwords and force password change at next logon",
+    "ObjectTypes": "inetOrgPerson",
+    "Template": [
+      {
+        "ObjectType": "inetOrgPerson",
+        "Property": "Reset Password",
+        "Right": "ExtendedRight"
+      },
+      {
+        "ObjectType": "inetOrgPerson",
+        "Property": "pwdLastSet",
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "inetOrgPerson",
+        "Property": "pwdLastSet",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "702",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Read all inetOrgPerson information",
+    "ObjectTypes": "inetOrgPerson",
+    "Template": [
+      {
+        "ObjectType": "inetOrgPerson",
+        "Property": "@",
+        "Right": "ReadProperty"
+      }
+    ]
+  }
+]

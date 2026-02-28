@@ -1,0 +1,23 @@
+{
+  "ID": "600",
+  "AppliesToClasses": "container",
+  "Description": "Create, Delete, and Manage WMI Filters",
+  "ObjectTypes": "SCOPE,msWMI-Som",
+  "Template": [
+    {
+      "ObjectType": "SCOPE",
+      "Property": "msWMI-Som",
+      "Right": "CreateChild"
+    },
+    {
+      "ObjectType": "SCOPE",
+      "Property": "msWMI-Som",
+      "Right": "DeleteChild"
+    },
+    {
+      "ObjectType": "msWMI-Som",
+      "Property": "@",
+      "Right": "GenericAll"
+    }
+  ]
+}

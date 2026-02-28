@@ -1,0 +1,98 @@
+[
+  {
+    "ID": "400",
+    "AppliesToClasses": "domainDNS,organizationalUnit",
+    "Description": "Create an Organizational Unit",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "organizationalUnit",
+        "Right": "CreateChild"
+      }
+    ]
+  },
+  {
+    "ID": "401",
+    "AppliesToClasses": "domainDNS,organizationalUnit",
+    "Description": "Delete a child Organizational Unit",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "organizationalUnit",
+        "Right": "DeleteChild"
+      }
+    ]
+  },
+  {
+    "ID": "402",
+    "AppliesToClasses": "organizationalUnit",
+    "Description": "Delete this Organizational Unit",
+    "ObjectTypes": "organizationalUnit",
+    "Template": [
+      {
+        "ObjectType": "organizationalUnit",
+        "Property": "@",
+        "Right": "Delete"
+      }
+    ]
+  },
+  {
+    "ID": "403",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Rename an Organizational Unit",
+    "ObjectTypes": "organizationalUnit",
+    "Template": [
+      {
+        "ObjectType": "organizationalUnit",
+        "Property": "ou",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "organizationalUnit",
+        "Property": "name",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "404",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify Description of an Organizational Unit",
+    "ObjectTypes": "organizationalUnit",
+    "Template": [
+      {
+        "ObjectType": "organizationalUnit",
+        "Property": "description",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "405",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify Managed-By Information of an Organizational Unit",
+    "ObjectTypes": "organizationalUnit",
+    "Template": [
+      {
+        "ObjectType": "organizationalUnit",
+        "Property": "managedBy",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "406",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Delegate Control of an Organizational Unit",
+    "ObjectTypes": "organizationalUnit",
+    "Template": [
+      {
+        "ObjectType": "organizationalUnit",
+        "Property": "@",
+        "Right": "WriteDacl"
+      }
+    ]
+  }
+]
