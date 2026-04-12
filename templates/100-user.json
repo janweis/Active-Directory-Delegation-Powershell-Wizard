@@ -1,6 +1,7 @@
 [
   {
     "ID": "100",
+    "Category": "Account Lifecycle",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Create, delete, and manage user accounts",
     "ObjectTypes": "SCOPE,user",
@@ -18,48 +19,29 @@
       {
         "ObjectType": "user",
         "Property": "@",
-        "Right": "GenericAll"
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "@",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "@",
+        "Right": "Delete"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "Reset Password",
+        "Right": "ExtendedRight"
       }
     ]
   },
   {
     "ID": "101",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Reset user passwords and force password change at next logon",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "Reset Password",
-        "Right": "ExtendedRight"
-      },
-      {
-        "ObjectType": "user",
-        "Property": "pwdLastSet",
-        "Right": "ReadProperty"
-      },
-      {
-        "ObjectType": "user",
-        "Property": "pwdLastSet",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "102",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Read all user information",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "@",
-        "Right": "ReadProperty"
-      }
-    ]
-  },
-  {
-    "ID": "103",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "User",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Create a user account in disabled state",
     "ObjectTypes": "SCOPE",
@@ -72,7 +54,8 @@
     ]
   },
   {
-    "ID": "104",
+    "ID": "102",
+    "Category": "Account Lifecycle",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Create a user account",
     "ObjectTypes": "SCOPE,user",
@@ -95,7 +78,9 @@
     ]
   },
   {
-    "ID": "105",
+    "ID": "103",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "User",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Delete a child user account",
     "ObjectTypes": "SCOPE",
@@ -108,7 +93,8 @@
     ]
   },
   {
-    "ID": "106",
+    "ID": "104",
+    "Category": "Account Lifecycle",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Delete this user account",
     "ObjectTypes": "user",
@@ -121,7 +107,8 @@
     ]
   },
   {
-    "ID": "107",
+    "ID": "105",
+    "Category": "Account Lifecycle",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Rename a user account",
     "ObjectTypes": "user",
@@ -144,7 +131,8 @@
     ]
   },
   {
-    "ID": "108",
+    "ID": "106",
+    "Category": "Account Lifecycle",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Disable a user account",
     "ObjectTypes": "user",
@@ -157,20 +145,8 @@
     ]
   },
   {
-    "ID": "109",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Unlock a user account",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "lockoutTime",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "110",
+    "ID": "107",
+    "Category": "Account Lifecycle",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Enable a disabled user account",
     "ObjectTypes": "user",
@@ -183,20 +159,142 @@
     ]
   },
   {
+    "ID": "108",
+    "Category": "Account Lifecycle",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Unlock a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "lockoutTime",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "109",
+    "Category": "Account Lifecycle",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Move a user account to a different organizationalUnit (source)",
+    "ObjectTypes": "user,SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "user",
+        "Right": "DeleteChild"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "distinguishedName",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "cn",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "name",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "110",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "User",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Move a user account to a different organizationalUnit (destination)",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "user",
+        "Right": "CreateChild"
+      }
+    ]
+  },
+  {
     "ID": "111",
+    "Category": "Account Lifecycle",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Read lockout information for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "badPwdCount",
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "badPasswordTime",
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "lockoutTime",
+        "Right": "ReadProperty"
+      }
+    ]
+  },
+  {
+    "ID": "112",
+    "Category": "Account Lifecycle",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Read last logon information for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "lastLogonTimestamp",
+        "Right": "ReadProperty"
+      }
+    ]
+  },
+  {
+    "ID": "113",
+    "Category": "Password",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Reset user passwords and force password change at next logon",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "Reset Password",
+        "Right": "ExtendedRight"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "pwdLastSet",
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "pwdLastSet",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "114",
+    "Category": "Password",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Reset a user account's password",
     "ObjectTypes": "user",
     "Template": [
       {
         "ObjectType": "user",
-        "Property": "Change Password",
+        "Property": "Reset Password",
         "Right": "ExtendedRight"
       }
     ]
   },
   {
-    "ID": "112",
+    "ID": "115",
+    "Category": "Password",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Force a user account to change the password at the next logon",
     "ObjectTypes": "user",
@@ -208,26 +306,136 @@
       },
       {
         "ObjectType": "user",
-        "Property": "userPassword",
+        "Property": "pwdLastSet",
         "Right": "WriteProperty"
       }
     ]
   },
   {
-    "ID": "113",
+    "ID": "116",
+    "Category": "Password",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Change a user account's password (requires knowledge of the current password)",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "Change Password",
+        "Right": "ExtendedRight"
+      }
+    ]
+  },
+  {
+    "ID": "117",
+    "Category": "Password",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify 'Password Never Expires' for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "userAccountControl",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "118",
+    "Category": "Password",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Read password status of a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "pwdLastSet",
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "badPwdCount",
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "badPasswordTime",
+        "Right": "ReadProperty"
+      }
+    ]
+  },
+  {
+    "ID": "119",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Read all user information",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "@",
+        "Right": "ReadProperty"
+      }
+    ]
+  },
+  {
+    "ID": "120",
+    "Category": "General",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify a user's display name",
     "ObjectTypes": "user",
     "Template": [
       {
         "ObjectType": "user",
-        "Property": "adminDisplayName",
+        "Property": "displayName",
         "Right": "WriteProperty"
       }
     ]
   },
   {
-    "ID": "114",
+    "ID": "121",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's first name",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "givenName",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "122",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's last name",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "sn",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "123",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's email address",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "mail",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "124",
+    "Category": "General",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify a user account's description",
     "ObjectTypes": "user",
@@ -240,7 +448,8 @@
     ]
   },
   {
-    "ID": "115",
+    "ID": "125",
+    "Category": "General",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify a user's office location",
     "ObjectTypes": "user",
@@ -253,7 +462,8 @@
     ]
   },
   {
-    "ID": "116",
+    "ID": "126",
+    "Category": "General",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify a user's telephone number",
     "ObjectTypes": "user",
@@ -266,7 +476,22 @@
     ]
   },
   {
-    "ID": "117",
+    "ID": "127",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's mobile phone number",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "mobile",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "128",
+    "Category": "General",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify the location of a user's primary web page",
     "ObjectTypes": "user",
@@ -279,7 +504,126 @@
     ]
   },
   {
-    "ID": "118",
+    "ID": "129",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's job title",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "title",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "130",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's department",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "department",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "131",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's company",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "company",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "132",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's manager",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "manager",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "133",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's address information",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "streetAddress",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "l",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "st",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "postalCode",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "co",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "134",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's profile photo",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "thumbnailPhoto",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "135",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify notes for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "info",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "136",
+    "Category": "Account",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify a user's UPN",
     "ObjectTypes": "user",
@@ -292,7 +636,8 @@
     ]
   },
   {
-    "ID": "119",
+    "ID": "137",
+    "Category": "Account",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify a user's Pre-Windows 2000 user logon name",
     "ObjectTypes": "user",
@@ -305,7 +650,8 @@
     ]
   },
   {
-    "ID": "120",
+    "ID": "138",
+    "Category": "Account",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify the hours during which a user can log on",
     "ObjectTypes": "user",
@@ -318,9 +664,10 @@
     ]
   },
   {
-    "ID": "121",
+    "ID": "139",
+    "Category": "Account",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Specify the computers from which a user can log on",
+    "Description": "Modify the computers from which a user can log on",
     "ObjectTypes": "user",
     "Template": [
       {
@@ -331,113 +678,10 @@
     ]
   },
   {
-    "ID": "122",
+    "ID": "140",
+    "Category": "Account",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Set User cannot change password for a user account",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "Change Password",
-        "Right": "ExtendedRight"
-      }
-    ]
-  },
-  {
-    "ID": "123",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Set Password Never Expires for a user account",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "userAccountControl",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "124",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Set Store Password Using Reversible Encryption for a user account",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "userAccountControl",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "125",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Disable a user account",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "userAccountControl",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "126",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Set Smart card is required for interactive logon for a user account",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "userAccountControl",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "127",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Set Account is sensitive and cannot be delegated for a user account",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "userAccountControl",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "128",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Set Use DES encryption types for this account for a user account",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "userAccountControl",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "129",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Set Do not require Kerberos pre-authentication for a user account",
-    "ObjectTypes": "user",
-    "Template": [
-      {
-        "ObjectType": "user",
-        "Property": "userAccountControl",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "130",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Specify the date when a user account expires",
+    "Description": "Modify the date when a user account expires",
     "ObjectTypes": "user",
     "Template": [
       {
@@ -448,9 +692,10 @@
     ]
   },
   {
-    "ID": "131",
+    "ID": "141",
+    "Category": "Account",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Specify a profile path for a user",
+    "Description": "Modify a user's profile path",
     "ObjectTypes": "user",
     "Template": [
       {
@@ -461,9 +706,10 @@
     ]
   },
   {
-    "ID": "132",
+    "ID": "142",
+    "Category": "Account",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Specify a logon script for a user",
+    "Description": "Modify a user's logon script",
     "ObjectTypes": "user",
     "Template": [
       {
@@ -474,44 +720,148 @@
     ]
   },
   {
-    "ID":  "133",
-    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
-    "Description":  "Move a user account to a different organizationalUnit (source)",
-    "ObjectTypes":  "user,scope",
-    "Template":  [
-     {
-         "ObjectType":  "scope",
-         "Property":  "user",
-         "Right":  "DeleteChild"
-     },
-     {
-         "ObjectType":  "user",
-         "Property":  "distinguishedName",
-         "Right":  "WriteProperty"
-     },
-     {
-         "ObjectType":  "user",
-         "Property":  "cn",
-         "Right":  "WriteProperty"
-     },
-     {
-         "ObjectType":  "user",
-         "Property":  "name",
-         "Right":  "WriteProperty"
-     }
+    "ID": "143",
+    "Category": "Account",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify a user's home directory",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "homeDirectory",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "user",
+        "Property": "homeDrive",
+        "Right": "WriteProperty"
+      }
     ]
   },
   {
-    "ID":  "134",
-    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
-    "Description":  "Move a user account to a different organizationalUnit (destination)",
-    "ObjectTypes":  "scope",
-    "Template":  [
-     {
-         "ObjectType":  "scope",
-         "Property":  "user",
-         "Right":  "CreateChild"
-     }
+    "ID": "144",
+    "Category": "Security",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify Store Password Using Reversible Encryption for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "userAccountControl",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "145",
+    "Category": "Security",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify Smart card is required for interactive logon for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "userAccountControl",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "146",
+    "Category": "Security",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify Account is sensitive and cannot be delegated for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "userAccountControl",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "147",
+    "Category": "Security",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify Use DES encryption types for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "userAccountControl",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "148",
+    "Category": "Security",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify Do not require Kerberos pre-authentication for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "userAccountControl",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "149",
+    "Category": "Security",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify Kerberos encryption types for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "msDS-SupportedEncryptionTypes",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "150",
+    "Category": "Security",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify constrained delegation targets for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "msDS-AllowedToDelegateTo",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "151",
+    "Category": "Security",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify resource-based constrained delegation for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "msDS-AllowedToActOnBehalfOfOtherIdentity",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "152",
+    "Category": "Security",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Allow validated write to service principal name for a user account",
+    "ObjectTypes": "user",
+    "Template": [
+      {
+        "ObjectType": "user",
+        "Property": "Validated write to service principal name",
+        "Right": "Self"
+      }
     ]
   }
 ]

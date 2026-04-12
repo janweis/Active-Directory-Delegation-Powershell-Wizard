@@ -1,6 +1,7 @@
 [
   {
     "ID": "200",
+    "Category": "Account Lifecycle",
     "AppliesToClasses": "organizationalUnit,container",
     "Description": "Create, delete and manage groups",
     "ObjectTypes": "SCOPE,group",
@@ -18,12 +19,135 @@
       {
         "ObjectType": "group",
         "Property": "@",
-        "Right": "GenericAll"
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "group",
+        "Property": "@",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "group",
+        "Property": "@",
+        "Right": "Delete"
       }
     ]
   },
   {
     "ID": "201",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "Group",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Create a group",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "group",
+        "Right": "CreateChild"
+      }
+    ]
+  },
+  {
+    "ID": "202",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "Group",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Delete a child group",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "group",
+        "Right": "DeleteChild"
+      }
+    ]
+  },
+  {
+    "ID": "203",
+    "Category": "Account Lifecycle",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Delete this group",
+    "ObjectTypes": "group",
+    "Template": [
+      {
+        "ObjectType": "group",
+        "Property": "@",
+        "Right": "Delete"
+      }
+    ]
+  },
+  {
+    "ID": "204",
+    "Category": "Account Lifecycle",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Rename a group",
+    "ObjectTypes": "group",
+    "Template": [
+      {
+        "ObjectType": "group",
+        "Property": "cn",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "group",
+        "Property": "name",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "group",
+        "Property": "distinguishedName",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "205",
+    "Category": "Account Lifecycle",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Move a group to a different organizationalUnit (source)",
+    "ObjectTypes": "group,SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "group",
+        "Right": "DeleteChild"
+      },
+      {
+        "ObjectType": "group",
+        "Property": "distinguishedName",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "group",
+        "Property": "cn",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "group",
+        "Property": "name",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "206",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "Group",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Move a group to a different organizationalUnit (destination)",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      {
+        "ObjectType": "SCOPE",
+        "Property": "group",
+        "Right": "CreateChild"
+      }
+    ]
+  },
+  {
+    "ID": "207",
+    "Category": "Membership",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify the membership of a group",
     "ObjectTypes": "group",
@@ -41,129 +165,8 @@
     ]
   },
   {
-    "ID": "202",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Create a group",
-    "ObjectTypes": "SCOPE",
-    "Template": [
-      {
-        "ObjectType": "SCOPE",
-        "Property": "group",
-        "Right": "CreateChild"
-      }
-    ]
-  },
-  {
-    "ID": "203",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Delete a child group",
-    "ObjectTypes": "SCOPE",
-    "Template": [
-      {
-        "ObjectType": "SCOPE",
-        "Property": "group",
-        "Right": "DeleteChild"
-      }
-    ]
-  },
-  {
-    "ID": "204",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Delete this group",
-    "ObjectTypes": "group",
-    "Template": [
-      {
-        "ObjectType": "group",
-        "Property": "@",
-        "Right": "Delete"
-      }
-    ]
-  },
-  {
-    "ID": "205",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Rename a group",
-    "ObjectTypes": "group",
-    "Template": [
-      {
-        "ObjectType": "group",
-        "Property": "cn",
-        "Right": "WriteProperty"
-      },
-      {
-        "ObjectType": "group",
-        "Property": "name",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "206",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Specify the Pre-Windows 2000 compatible name for the group",
-    "ObjectTypes": "group",
-    "Template": [
-      {
-        "ObjectType": "group",
-        "Property": "sAMAccountName",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "207",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Modify the description of a group",
-    "ObjectTypes": "group",
-    "Template": [
-      {
-        "ObjectType": "group",
-        "Property": "description",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
     "ID": "208",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Modify the scope of the group",
-    "ObjectTypes": "group",
-    "Template": [
-      {
-        "ObjectType": "group",
-        "Property": "groupType",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "209",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Modify the type of the group",
-    "ObjectTypes": "group",
-    "Template": [
-      {
-        "ObjectType": "group",
-        "Property": "groupType",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "210",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Modify notes for a group",
-    "ObjectTypes": "group",
-    "Template": [
-      {
-        "ObjectType": "group",
-        "Property": "info",
-        "Right": "WriteProperty"
-      }
-    ]
-  },
-  {
-    "ID": "211",
+    "Category": "Membership",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify group membership",
     "ObjectTypes": "group",
@@ -176,7 +179,78 @@
     ]
   },
   {
+    "ID": "209",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Specify the Pre-Windows 2000 compatible name for the group",
+    "ObjectTypes": "group",
+    "Template": [
+      {
+        "ObjectType": "group",
+        "Property": "sAMAccountName",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "210",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify the description of a group",
+    "ObjectTypes": "group",
+    "Template": [
+      {
+        "ObjectType": "group",
+        "Property": "description",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "211",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify the scope of the group",
+    "ObjectTypes": "group",
+    "Template": [
+      {
+        "ObjectType": "group",
+        "Property": "groupType",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
     "ID": "212",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify the type of the group",
+    "ObjectTypes": "group",
+    "Template": [
+      {
+        "ObjectType": "group",
+        "Property": "groupType",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "213",
+    "Category": "General",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Modify notes for a group",
+    "ObjectTypes": "group",
+    "Template": [
+      {
+        "ObjectType": "group",
+        "Property": "info",
+        "Right": "WriteProperty"
+      }
+    ]
+  },
+  {
+    "ID": "214",
+    "Category": "General",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Specify Managed-By Information of a Group",
     "ObjectTypes": "group",
@@ -186,47 +260,6 @@
         "Property": "managedBy",
         "Right": "WriteProperty"
       }
-    ]
-  },
-  {
-    "ID":  "213",
-    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
-    "Description":  "Move a group to a different organizationalUnit (source)",
-    "ObjectTypes":  "group,scope",
-    "Template":  [
-     {
-         "ObjectType":  "scope",
-         "Property":  "group",
-         "Right":  "DeleteChild"
-     },
-     {
-         "ObjectType":  "group",
-         "Property":  "distinguishedName",
-         "Right":  "WriteProperty"
-     },
-     {
-         "ObjectType":  "group",
-         "Property":  "cn",
-         "Right":  "WriteProperty"
-     },
-     {
-         "ObjectType":  "group",
-         "Property":  "name",
-         "Right":  "WriteProperty"
-     }
-    ]
-  },
-  {
-    "ID":  "214",
-    "AppliesToClasses":  "domainDNS,organizationalUnit,container",
-    "Description":  "Move a group to a different organizationalUnit (destination)",
-    "ObjectTypes":  "scope",
-    "Template":  [
-     {
-         "ObjectType":  "scope",
-         "Property":  "group",
-         "Right":  "CreateChild"
-     }
     ]
   }
 ]

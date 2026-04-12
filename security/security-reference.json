@@ -1,0 +1,3150 @@
+{
+  "_meta": {
+    "description": "AD Attribute Security Reference - Foundation for RiskLevel, SecurityNotes and ReferenceURL in delegation templates",
+    "version": "1.0.0",
+    "lastUpdated": "2026-04-12",
+    "riskLevels": {
+      "Critical": "Direct domain/object takeover possible",
+      "High": "Privilege escalation or persistence possible",
+      "Medium": "Lateral movement or information disclosure",
+      "Low": "Low abuse potential"
+    },
+    "schema": {
+      "references[]": {
+        "id": "GUID or unique identifier for reference",
+        "category": "Logical grouping for human readability",
+        "attribute": "AD attribute or extended right display name (matching key)",
+        "riskLevel": "Critical | High | Medium | Low",
+        "attackTechnique": "Generic attack description (shown when no context match)",
+        "appliesTo": "(Optional) Array of {context, detail} for context-specific warnings",
+        "knownTools": "Array of known offensive tool names",
+        "referenceURL": "URL to public attack writeup or schema documentation"
+      }
+    }
+  },
+  "references": [
+    {
+      "id": "6931d289-8f6b-4ac1-9421-44919ebb9673",
+      "category": "Access Control & DACL",
+      "attribute": "nTSecurityDescriptor",
+      "riskLevel": "Critical",
+      "attackTechnique": "Directly manipulate the object's DACL - full access control",
+      "appliesTo": [
+        {
+          "object": "group",
+          "impact": "Directly manipulate group DACL - full access"
+        },
+        {
+          "object": "organizationalUnit",
+          "impact": "Manipulate OU DACL - control over all objects in the OU"
+        },
+        {
+          "object": "groupPolicyContainer",
+          "impact": "GPO DACL - grant write access to GPO"
+        },
+        {
+          "object": "pKICertificateTemplate",
+          "impact": "Template DACL - grant write access - ESC4"
+        },
+        {
+          "object": "adminSDHolder",
+          "impact": "AdminSDHolder DACL - backdoor all protected accounts (propagates every 60 minutes)"
+        }
+      ],
+      "knownTools": [
+        "Certipy",
+        "Custom",
+        "PowerView",
+        "SharpGPOAbuse"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1222/"
+    },
+    {
+      "id": "2d92fdb8-3c66-4950-8fd5-2cb183091294",
+      "category": "AD Certificate Services",
+      "attribute": "AutoEnroll",
+      "riskLevel": "High",
+      "attackTechnique": "Automatic certificate enrollment",
+      "knownTools": [
+        "Certipy"
+      ],
+      "referenceURL": "https://github.com/ly4k/Certipy"
+    },
+    {
+      "id": "70acd72e-cf8c-45fa-9ed2-e9df8f321989",
+      "category": "AD Certificate Services",
+      "attribute": "ManageCertificates",
+      "riskLevel": "Critical",
+      "attackTechnique": "Issue/revoke certificates → approve pending requests (ESC7)",
+      "knownTools": [
+        "Certipy"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "517b4fc4-8e4b-457d-94db-49d312d56ae9",
+      "category": "AD Certificate Services",
+      "attribute": "ManageCA",
+      "riskLevel": "Critical",
+      "attackTechnique": "Manage CA → control all certificates, templates, CRLs",
+      "knownTools": [
+        "Certipy"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "6e6f4a73-34ea-490b-b671-323eef799eee",
+      "category": "AD Certificate Services",
+      "attribute": "WriteProperty",
+      "riskLevel": "Critical",
+      "attackTechnique": "Change object configuration - all properties writable",
+      "appliesTo": [
+        {
+          "object": "certificationAuthority",
+          "impact": "Change CA configuration - all certificates compromised"
+        },
+        {
+          "object": "dnsZone",
+          "impact": "Modify DNS zone properties - enable zone transfers"
+        }
+      ],
+      "knownTools": [
+        "Certipy",
+        "Custom"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "c8149e01-49b4-442e-bf7b-223b96ffd014",
+      "category": "AD Certificate Services",
+      "attribute": "Enroll",
+      "riskLevel": "High",
+      "attackTechnique": "Request certificate → authenticate as another identity (ESC1-ESC13)",
+      "knownTools": [
+        "Certify",
+        "Certipy"
+      ],
+      "referenceURL": "https://github.com/ly4k/Certipy"
+    },
+    {
+      "id": "90717276-7344-482d-ad49-93919abe1d9b",
+      "category": "AD Certificate Services",
+      "attribute": "msPKI-RA-Signature",
+      "riskLevel": "Critical",
+      "attackTechnique": "No enrollment agent approval required → ESC3",
+      "knownTools": [
+        "Certipy"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "526208cd-25a0-4eff-a98a-814dbbc05c13",
+      "category": "AD Certificate Services",
+      "attribute": "msPKI-Enrollment-Flag",
+      "riskLevel": "Critical",
+      "attackTechnique": "Disable PEND_ALL_REQUESTS → immediate certificate issuance",
+      "knownTools": [
+        "Certipy"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "276fd6e6-b84d-479e-a6fd-35cf2dd0b09a",
+      "category": "AD Certificate Services",
+      "attribute": "msPKI-Certificate-Name-Flag",
+      "riskLevel": "Critical",
+      "attackTechnique": "ENROLLEE_SUPPLIES_SUBJECT → arbitrary SAN → ESC1",
+      "knownTools": [
+        "Certify",
+        "Certipy"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "1812cdf4-dfd6-4f5c-b97a-25c252e96ad5",
+      "category": "AD Certificate Services",
+      "attribute": "pkiExtendedKeyUsage",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate EKU → make certificate usable for authentication",
+      "knownTools": [
+        "Certipy"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "d53602ed-9809-42d0-9529-0df4094c0f5a",
+      "category": "Additional Attack Vectors",
+      "attribute": "userCertificate",
+      "riskLevel": "High",
+      "attackTechnique": "A user's certificate → certificate-based authentication",
+      "knownTools": [
+        "Certipy"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "468d5783-1f5b-497a-bb2d-a63087c7cf42",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-AssignedAuthNPolicySilo",
+      "riskLevel": "High",
+      "attackTechnique": "Change the assigned authentication policy silo",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/authentication-policies-and-authentication-policy-silos"
+    },
+    {
+      "id": "6e62cbc5-ec20-4f46-9664-a30f0136c98b",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-AssignedAuthNPolicy",
+      "riskLevel": "High",
+      "attackTechnique": "Change the assigned authentication policy",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/authentication-policies-and-authentication-policy-silos"
+    },
+    {
+      "id": "a6ded32f-7073-4114-b517-79dfac3489fe",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-AuthNPolicySilo",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate the Authentication Policy Silo → bypass Kerberos restrictions",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/authentication-policies-and-authentication-policy-silos"
+    },
+    {
+      "id": "f772fc67-2071-457c-9f2a-346654d39e6a",
+      "category": "Additional Attack Vectors",
+      "attribute": "otherWellKnownObjects",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate alternative WKO references",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-otherwellknownobjects"
+    },
+    {
+      "id": "2ca59f4e-6e00-4757-9f42-3afd4daea0f8",
+      "category": "Additional Attack Vectors",
+      "attribute": "wellKnownObjects",
+      "riskLevel": "High",
+      "attackTechnique": "Well-known object references → redirect known containers to incorrect OUs",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-wellknownobjects"
+    },
+    {
+      "id": "a6102e45-6ac1-4917-8488-ca59cdb66349",
+      "category": "Additional Attack Vectors",
+      "attribute": "certificateRevocationList",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate the CRL → make revoked certificates appear valid",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "c514c5f0-0d9b-4eb8-a741-2933c1e7e90e",
+      "category": "Additional Attack Vectors",
+      "attribute": "cACertificate",
+      "riskLevel": "Critical",
+      "attackTechnique": "Publish a CA certificate → introduce a rogue CA (ESC8)",
+      "knownTools": [
+        "Certipy"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "6f67f262-681e-4a33-97fa-a03d7369699d",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-AllowedDNSSuffixes",
+      "riskLevel": "Medium",
+      "attackTechnique": "DNS suffixes → namespace collision",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-msds-alloweddnssuffixes"
+    },
+    {
+      "id": "d8f00dd5-0e55-45c6-83a0-7f91df630f4b",
+      "category": "Additional Attack Vectors",
+      "attribute": "lockOutObservationWindow",
+      "riskLevel": "Medium",
+      "attackTechnique": "Manipulate the observation window",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "d97c5e87-1a1c-4cdd-8e6c-1eddfc183b2b",
+      "category": "Additional Attack Vectors",
+      "attribute": "netbootInitialization",
+      "riskLevel": "Medium",
+      "attackTechnique": "PXE initialization → boot manipulation",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1542/"
+    },
+    {
+      "id": "b4f8d999-9981-4262-88b3-8e5992bd40dd",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-IsUserCachableAtRodc",
+      "riskLevel": "Medium",
+      "attackTechnique": "Check RODC caching",
+      "knownTools": [
+        "BloodHound"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=3592"
+    },
+    {
+      "id": "ed2bf8f4-6cf6-4284-8461-7acac003ad97",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-CloudAnchor",
+      "riskLevel": "Medium",
+      "attackTechnique": "Azure AD sync anchor → hybrid identity manipulation",
+      "knownTools": [
+        "AADInternals"
+      ],
+      "referenceURL": "https://aadinternals.com/post/aadinternals/"
+    },
+    {
+      "id": "24854b15-24e0-4606-bc74-954247f4e2ef",
+      "category": "Additional Attack Vectors",
+      "attribute": "minPwdAge",
+      "riskLevel": "Medium",
+      "attackTechnique": "Minimum password age → faster password cycling",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "8519c7cd-b88f-4dd3-a164-687fb70c5d74",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-LocalEffectiveDeletionTime",
+      "riskLevel": "Low",
+      "attackTechnique": "Read deletion timestamps of deleted objects",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-msds-localeffectivedeletiontime"
+    },
+    {
+      "id": "8589e042-e5e7-432e-853a-16af761eb4dd",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-LogonTimeSyncInterval",
+      "riskLevel": "Low",
+      "attackTechnique": "Logon time sync interval",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-msds-logontimesyncinterval"
+    },
+    {
+      "id": "b9fbbb3f-25e5-4baa-82e2-2427bed89907",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-SiteName",
+      "riskLevel": "Low",
+      "attackTechnique": "Site membership → network topology reconnaissance",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1016/"
+    },
+    {
+      "id": "c24984af-f0aa-431f-88f3-a73bfa02af51",
+      "category": "Additional Attack Vectors",
+      "attribute": "userSMIMECertificate",
+      "riskLevel": "Medium",
+      "attackTechnique": "S/MIME certificate → email decryption",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "06ecb555-9c45-42fd-b610-f12a8681af3a",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-MachineAccountQuota",
+      "riskLevel": "Critical",
+      "attackTechnique": "Default = 10: users can create computer accounts → RBCD attack",
+      "knownTools": [
+        "Powermad",
+        "Rubeus"
+      ],
+      "referenceURL": "https://github.com/Kevin-Robertson/Powermad"
+    },
+    {
+      "id": "a4738a9f-edc7-40cb-a64d-47184c0d2896",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-ExternalDirectoryObjectId",
+      "riskLevel": "High",
+      "attackTechnique": "External object ID (Entra ID) → hybrid identity attacks",
+      "knownTools": [
+        "AADInternals"
+      ],
+      "referenceURL": "https://aadinternals.com/post/aadinternals/"
+    },
+    {
+      "id": "fb6b00f8-a57d-4412-beec-735f124a6e72",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDFSR-ComputerReference",
+      "riskLevel": "Medium",
+      "attackTechnique": "DFSR computer reference → analyze SYSVOL replication",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-msdFSR-computerreference"
+    },
+    {
+      "id": "2c10ed2b-d573-4e3a-b804-271cd404dc37",
+      "category": "Additional Attack Vectors",
+      "attribute": "msTPM-OwnerInformation",
+      "riskLevel": "Critical",
+      "attackTechnique": "TPM owner password → TPM bypass, BitLocker recovery",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1552/"
+    },
+    {
+      "id": "18d3a857-15ae-4adb-8b34-c812a1351bf9",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-EnabledFeature",
+      "riskLevel": "High",
+      "attackTechnique": "Enabled forest features (Recycle Bin, etc.)",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/active-directory-functional-levels"
+    },
+    {
+      "id": "993266f1-b9e6-40b2-9423-2ff659d9a19d",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-CentralAccessPolicy",
+      "riskLevel": "Medium",
+      "attackTechnique": "Manipulate the Central Access Policy (bypass DAC)",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/identity/solution-guides/dynamic-access-control-overview"
+    },
+    {
+      "id": "0bf4dc9c-0515-4e7f-bdbc-653fcdec2b17",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-ClaimTypes",
+      "riskLevel": "Medium",
+      "attackTechnique": "Claim types → influence Dynamic Access Control",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/identity/solution-guides/dynamic-access-control-overview"
+    },
+    {
+      "id": "4233f009-3266-4752-91f5-18c12f0bed54",
+      "category": "Additional Attack Vectors",
+      "attribute": "msTPM-TpmInformationForComputer",
+      "riskLevel": "High",
+      "attackTechnique": "TPM info reference → read the TPM state",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1552/"
+    },
+    {
+      "id": "f683f055-cb8e-49d3-93cc-1230728d606b",
+      "category": "Additional Attack Vectors",
+      "attribute": "onPremisesSecurityIdentifier",
+      "riskLevel": "High",
+      "attackTechnique": "On-premises SID in Entra ID → SID mapping bypass",
+      "knownTools": [
+        "AADInternals"
+      ],
+      "referenceURL": "https://aadinternals.com/post/aadinternals/"
+    },
+    {
+      "id": "7b0e9af2-c3df-4707-ba98-b9f586571321",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-GenerationId",
+      "riskLevel": "Medium",
+      "attackTechnique": "VM GenerationID → bypass snapshot detection",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/virtualized-domain-controller-architecture"
+    },
+    {
+      "id": "c026742d-00c7-4fca-89c9-9e89e4042139",
+      "category": "Additional Attack Vectors",
+      "attribute": "netbootGuid",
+      "riskLevel": "Medium",
+      "attackTechnique": "PXE boot configuration → prepare PXE attacks",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1542/"
+    },
+    {
+      "id": "d19cf2a2-eefd-477f-a762-22c4a4431813",
+      "category": "Additional Attack Vectors",
+      "attribute": "replUpToDateVector",
+      "riskLevel": "Medium",
+      "attackTechnique": "Replication status → identify replication gaps",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-drsr/f977faaa-673e-4f66-b9bf-48c640241d47"
+    },
+    {
+      "id": "576349c1-c2cd-4708-8105-36c425acc9e2",
+      "category": "Additional Attack Vectors",
+      "attribute": "cACertificateDN",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate the CA certificate DN",
+      "knownTools": [
+        "Certipy"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "db5df723-863d-4dfe-9841-f8f88750f5f6",
+      "category": "Additional Attack Vectors",
+      "attribute": "crossCertificatePair",
+      "riskLevel": "High",
+      "attackTechnique": "Cross certificates → trust manipulation",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "cea9dbd7-a94c-43d7-905a-b81764e377ca",
+      "category": "Additional Attack Vectors",
+      "attribute": "authorityRevocationList",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate the ARL",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "0e9383d0-4a20-405f-a150-411029070269",
+      "category": "Additional Attack Vectors",
+      "attribute": "deltaRevocationList",
+      "riskLevel": "Medium",
+      "attackTechnique": "Manipulate the delta CRL",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/certified-pre-owned/"
+    },
+    {
+      "id": "a2583fe8-d3ac-4619-9536-bfdc1312e3d7",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-ResourcePropertyList",
+      "riskLevel": "Medium",
+      "attackTechnique": "Resource properties for DAC",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/identity/solution-guides/dynamic-access-control-overview"
+    },
+    {
+      "id": "9eafc91d-0cce-4017-ae6a-82055d9c1951",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-ExternalKey",
+      "riskLevel": "High",
+      "attackTechnique": "External key → manipulate authentication mechanisms",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-msds-externalkey"
+    },
+    {
+      "id": "bbc6dcb6-f9d0-47b1-84bb-3fe842cce5bc",
+      "category": "Additional Attack Vectors",
+      "attribute": "currentValue",
+      "riskLevel": "Medium",
+      "attackTechnique": "Current values visible during partial replication",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-drsr/f977faaa-673e-4f66-b9bf-48c640241d47"
+    },
+    {
+      "id": "13ecf8ad-927b-4185-a192-8577a255502f",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDFSR-Enabled",
+      "riskLevel": "High",
+      "attackTechnique": "Disable DFSR → disrupt SYSVOL replication → GPOs are no longer current",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    },
+    {
+      "id": "d7fd1a61-d518-4b6d-a4f3-b76fbe009b55",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-DeviceID",
+      "riskLevel": "Medium",
+      "attackTechnique": "Device ID → bypass device-based Conditional Access",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1556/"
+    },
+    {
+      "id": "83af9620-6173-4c37-93fe-92bd47362c06",
+      "category": "Additional Attack Vectors",
+      "attribute": "msFVE-RecoveryPassword",
+      "riskLevel": "Critical",
+      "attackTechnique": "BitLocker recovery key in plaintext",
+      "knownTools": [
+        "Custom LDAP",
+        "BloodHound"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1552/"
+    },
+    {
+      "id": "e4d92f05-ef36-4f22-9682-a0a4e90518d7",
+      "category": "Additional Attack Vectors",
+      "attribute": "msFVE-KeyPackage",
+      "riskLevel": "Critical",
+      "attackTechnique": "BitLocker key package → decrypt the drive",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1552/"
+    },
+    {
+      "id": "883cc15c-b966-464b-a007-d4a08cd855bb",
+      "category": "Additional Attack Vectors",
+      "attribute": "pwdProperties",
+      "riskLevel": "High",
+      "attackTechnique": "Disable complexity requirements at the domain level",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "5830ec9d-9a3c-4cdc-83eb-6ec28c21e509",
+      "category": "Additional Attack Vectors",
+      "attribute": "minPwdLength",
+      "riskLevel": "High",
+      "attackTechnique": "Set the minimum password length to 0 → allow trivial passwords",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "a026b702-2457-46b0-ad7b-4f86c1b86311",
+      "category": "Additional Attack Vectors",
+      "attribute": "lockoutDuration",
+      "riskLevel": "Medium",
+      "attackTechnique": "Set the lockout duration to 0 → immediate automatic unlock",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "0f7b31b6-fef8-47e3-bcf2-d5d908d9b5aa",
+      "category": "Additional Attack Vectors",
+      "attribute": "nCName",
+      "riskLevel": "High",
+      "attackTechnique": "Naming context name → partition manipulation",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-ncname"
+    },
+    {
+      "id": "c5209c50-9a65-446c-b790-6d9fb6e7644b",
+      "category": "Additional Attack Vectors",
+      "attribute": "lockoutThreshold",
+      "riskLevel": "Medium",
+      "attackTechnique": "Increase the threshold → make brute-force attacks easier",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "3f01be92-1279-4d97-8363-5adf3484f98e",
+      "category": "Additional Attack Vectors",
+      "attribute": "msDS-Behavior-Version",
+      "riskLevel": "High",
+      "attackTechnique": "Artificially keep the domain/forest functional level low",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/active-directory-functional-levels"
+    },
+    {
+      "id": "e1c60272-bbc1-4902-b6e1-a6ec501982f3",
+      "category": "Additional Attack Vectors",
+      "attribute": "maxPwdAge",
+      "riskLevel": "Medium",
+      "attackTechnique": "Maximum password age → passwords never expire",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1098/"
+    },
+    {
+      "id": "83bbbed6-5c77-4496-a826-7b8f290dc323",
+      "category": "Additional Attack Vectors",
+      "attribute": "pwdHistoryLength",
+      "riskLevel": "Medium",
+      "attackTechnique": "Reduce password history → allow reuse",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "e4580d3a-98cf-4438-94b3-62e647ae2db5",
+      "category": "AdminSDHolder / Protected Users",
+      "attribute": "adminCount",
+      "riskLevel": "High",
+      "attackTechnique": "Disable AdminSDHolder protection by setting adminCount=0; set manually to 1 - SDProp protects the account",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=1906"
+    },
+    {
+      "id": "1cc1bf5e-b746-4856-b6db-f23f323f0f0a",
+      "category": "Computer Objects",
+      "attribute": "Account Restrictions",
+      "riskLevel": "High",
+      "attackTechnique": "Property set includes: userAccountControl, logonHours, userWorkstations, accountExpires, etc. → delegating this set allows simultaneous manipulation of multiple security-relevant computer attributes",
+      "knownTools": [
+        "PowerShell AD",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-user-account-restrictions"
+    },
+    {
+      "id": "933bb1fd-d981-4173-9e1f-1aefdbafc3ba",
+      "category": "Computer Objects",
+      "attribute": "msDS-AdditionalDnsHostName",
+      "riskLevel": "High",
+      "attackTechnique": "Set additional DNS alias names on a computer account → noPac variant: a computer account with another host's SPN → a Kerberos ticket can be issued for a foreign host (Silver Ticket / impersonation)",
+      "knownTools": [
+        "Custom LDAP",
+        "noPac PoC"
+      ],
+      "referenceURL": "https://www.thehacker.recipes/ad/movement/kerberos/samaccountname-spoofing"
+    },
+    {
+      "id": "0f11509f-2a72-4669-90f3-039b9c69e991",
+      "category": "Computer Objects",
+      "attribute": "lastLogonTimestamp",
+      "riskLevel": "Low",
+      "attackTechnique": "Identify inactive accounts → attack targets",
+      "knownTools": [
+        "BloodHound"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1087/002/"
+    },
+    {
+      "id": "5ac6e146-e37f-4dcb-a834-8bb9be3a36a0",
+      "category": "Computer Objects",
+      "attribute": "Validated write to service principal name",
+      "riskLevel": "High",
+      "attackTechnique": "Validated write of SPNs to the computer's own account; abuse enables Kerberoasting or Silver Ticket attacks by adding arbitrary SPNs",
+      "knownTools": [
+        "Rubeus",
+        "Impacket"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1558/003/"
+    },
+    {
+      "id": "219c2d57-8516-4425-88fe-a67049b4f053",
+      "category": "Computer Objects",
+      "attribute": "operatingSystemVersion",
+      "riskLevel": "Medium",
+      "attackTechnique": "Version information → patch level, exploit selection",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1018/"
+    },
+    {
+      "id": "44eafded-3254-4912-8d76-32ad7fbd9c74",
+      "category": "Computer Objects",
+      "attribute": "localPolicyFlags",
+      "riskLevel": "Medium",
+      "attackTechnique": "Manipulate local policy flags",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-localpolicyflags"
+    },
+    {
+      "id": "e0726439-3138-443d-9132-063aa53b6994",
+      "category": "Computer Objects",
+      "attribute": "dNSHostName",
+      "riskLevel": "High",
+      "attackTechnique": "Change DNS name → MitM, noPac preparation",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://www.thehacker.recipes/ad/movement/kerberos/samaccountname-spoofing"
+    },
+    {
+      "id": "c3f3c186-3136-4322-afc1-860c42166cfb",
+      "category": "Computer Objects",
+      "attribute": "Validated write to DNS host name",
+      "riskLevel": "High",
+      "attackTechnique": "Validated write of dNSHostName to the computer's own account; noPac preparation (CVE-2021-42278/42287) and MitM preparation through DNS name manipulation",
+      "knownTools": [
+        "Custom LDAP",
+        "noPac PoC"
+      ],
+      "referenceURL": "https://www.thehacker.recipes/ad/movement/kerberos/samaccountname-spoofing"
+    },
+    {
+      "id": "fd7387ae-26f3-413a-82cf-d39b1e7b9027",
+      "category": "Computer Objects",
+      "attribute": "operatingSystem",
+      "riskLevel": "Low",
+      "attackTechnique": "OS information → identify vulnerable systems",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1018/"
+    },
+    {
+      "id": "ca8ac537-45ab-486d-bb32-113162bed301",
+      "category": "DNS (AD-integrated)",
+      "attribute": "dNSTombstoned",
+      "riskLevel": "Medium",
+      "attackTechnique": "Reactivate tombstoned DNS entries",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://www.netspi.com/blog/technical-blog/network-penetration-testing/exploiting-adidns/"
+    },
+    {
+      "id": "4f8b727d-986d-41e0-b7d1-693a860aea4d",
+      "category": "DNS (AD-integrated)",
+      "attribute": "forwarderTimeout",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate DNS forwarder configuration",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1557/"
+    },
+    {
+      "id": "4c94d577-77b6-4d29-bb1b-da83882e6b10",
+      "category": "DNS (AD-integrated)",
+      "attribute": "dnsRecord",
+      "riskLevel": "Critical",
+      "attackTechnique": "Write DNS records → DNS hijacking / MitM (ADIDNS attack)",
+      "knownTools": [
+        "Powermad",
+        "Inveigh"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1557/"
+    },
+    {
+      "id": "982b9ce6-75dc-487b-8150-f47c978a006e",
+      "category": "DNS (AD-integrated)",
+      "attribute": "msDS-DNSRootAlias",
+      "riskLevel": "Medium",
+      "attackTechnique": "DNS root alias → influence name resolution",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-msds-dnsrootalias"
+    },
+    {
+      "id": "42b4275d-40d1-4452-83a7-07c7fe4264e4",
+      "category": "Domain & Forest Trust",
+      "attribute": "trustType",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate trust type",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1482/"
+    },
+    {
+      "id": "deb8cf9a-644b-4b9b-a725-46613f1cb3db",
+      "category": "Domain & Forest Trust",
+      "attribute": "trustDirection",
+      "riskLevel": "High",
+      "attackTechnique": "Trust direction → attack paths to other domains",
+      "knownTools": [
+        "BloodHound"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1482/"
+    },
+    {
+      "id": "52bf576c-aabc-4a0d-a08d-510d7ab6e8a2",
+      "category": "Domain & Forest Trust",
+      "attribute": "securityIdentifier",
+      "riskLevel": "Critical",
+      "attackTechnique": "Trust SID → SID history injection",
+      "knownTools": [
+        "Mimikatz"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=1640"
+    },
+    {
+      "id": "35609119-54b2-47ee-b355-e278979626bc",
+      "category": "Domain & Forest Trust",
+      "attribute": "msDS-TrustForestTrustInfo",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate forest trust SID filter",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1134/005/"
+    },
+    {
+      "id": "80a0b752-9214-443b-b29d-075452806a6b",
+      "category": "Domain & Forest Trust",
+      "attribute": "flatName",
+      "riskLevel": "Medium",
+      "attackTechnique": "NetBIOS name of the trusted forest",
+      "knownTools": [
+        "Reconnaissance"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1482/"
+    },
+    {
+      "id": "5cad4a49-16a6-4b0c-be43-efc46fe1a90b",
+      "category": "Domain & Forest Trust",
+      "attribute": "dnsRoot",
+      "riskLevel": "Medium",
+      "attackTechnique": "DNS root of the trust → routing manipulation",
+      "knownTools": [
+        "DNS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1482/"
+    },
+    {
+      "id": "32929d51-2865-4cac-90d4-1b54b4aad521",
+      "category": "Domain & Forest Trust",
+      "attribute": "trustAttributes",
+      "riskLevel": "Critical",
+      "attackTechnique": "Disable SID filtering (TREAT_AS_EXTERNAL) → SID history attack / forest takeover",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1134/005/"
+    },
+    {
+      "id": "321c4eb4-0ff3-4c72-aa4b-4b58274a0d49",
+      "category": "Exchange / Hybrid Attributes",
+      "attribute": "targetAddress",
+      "riskLevel": "High",
+      "attackTechnique": "Mail forwarding to an external address",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/003/"
+    },
+    {
+      "id": "ebe34f04-7c5a-4e5d-bd32-af956e32ebb9",
+      "category": "Exchange / Hybrid Attributes",
+      "attribute": "msExchMasterAccountSid",
+      "riskLevel": "High",
+      "attackTechnique": "Master account SID → linked mailbox access",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "8df3e104-0d66-4383-9350-0bc884caa679",
+      "category": "Exchange / Hybrid Attributes",
+      "attribute": "msExchHideFromAddressLists",
+      "riskLevel": "Medium",
+      "attackTechnique": "Hide the mailbox from the GAL → phantom account",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1564/"
+    },
+    {
+      "id": "c99cb5b8-a3b7-41d6-8cc8-eabc1223c56d",
+      "category": "Exchange / Hybrid Attributes",
+      "attribute": "publicDelegatesBL",
+      "riskLevel": "Medium",
+      "attackTechnique": "Backlink to publicDelegates",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "0f7042e4-850d-491d-8655-89bc04e68ea6",
+      "category": "Exchange / Hybrid Attributes",
+      "attribute": "msExchDelegateListBL",
+      "riskLevel": "High",
+      "attackTechnique": "Full Access Mailbox Delegation",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "0481e950-d8d7-4e4d-8e38-c43762b7527d",
+      "category": "Exchange / Hybrid Attributes",
+      "attribute": "publicDelegates",
+      "riskLevel": "High",
+      "attackTechnique": "Send-on-behalf delegation",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "09f170c0-eb3c-45a3-8d4e-7e81b8816c49",
+      "category": "Exchange / Hybrid Attributes",
+      "attribute": "msExchGenericForwardingAddress",
+      "riskLevel": "High",
+      "attackTechnique": "Auto-forwarding to an external address → data exfiltration",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/003/"
+    },
+    {
+      "id": "73066a35-3388-4a4a-8d27-47f4ed5850e0",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "DS-Replication-Get-Changes",
+      "riskLevel": "Critical",
+      "attackTechnique": "DCSync - replicates password hashes from the DC",
+      "knownTools": [
+        "Mimikatz",
+        "Impacket secretsdump"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=1729"
+    },
+    {
+      "id": "75f91cb2-bc1a-4cef-b2fa-46e3db9a88d9",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Add/Remove Self as Member",
+      "riskLevel": "High",
+      "attackTechnique": "Self right on a group's member attribute: add or remove your own membership → privilege escalation by joining privileged groups",
+      "knownTools": [
+        "PowerView",
+        "BloodHound"
+      ],
+      "referenceURL": "https://bloodhound.specterops.io/resources/edges/add-self"
+    },
+    {
+      "id": "23e26094-974e-4f5a-9f79-3db3de129bc5",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Change-Domain-Master",
+      "riskLevel": "Critical",
+      "attackTechnique": "Transfer Domain Naming Master role",
+      "knownTools": [
+        "netdom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/"
+    },
+    {
+      "id": "6d6eeda5-6f7d-4f41-bd96-8eb5a27cf926",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "User-Change-Password",
+      "riskLevel": "Medium",
+      "attackTechnique": "Change a user's password (with knowledge of the old password); in a delegation context, a delegate can change the password on behalf of the user",
+      "knownTools": [
+        "PowerView",
+        "LDAP"
+      ],
+      "referenceURL": "https://bloodhound.specterops.io/resources/edges/force-change-password"
+    },
+    {
+      "id": "99cfc795-d3ec-4d76-b4a9-a491ba7a59d6",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Reanimate-Tombstones",
+      "riskLevel": "High",
+      "attackTechnique": "Reactivate deleted AD objects (tombstones) → objects retain their original SID/objectSid → old permissions or group memberships are restored",
+      "knownTools": [
+        "Custom LDAP",
+        "PowerShell AD"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-reanimate-tombstones"
+    },
+    {
+      "id": "a024af07-8207-4482-848b-0f7fc579290e",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Allowed-To-Authenticate",
+      "riskLevel": "Critical",
+      "attackTechnique": "Allows authentication via S4U2Self without explicit constrained delegation configuration → impersonate any user to the affected service",
+      "knownTools": [
+        "Rubeus"
+      ],
+      "referenceURL": "https://specterops.io/blog/2018/10/25/another-word-on-delegation/"
+    },
+    {
+      "id": "6a3821fe-1969-4100-a7f4-0f68a329a6d0",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "DS-Clone-Domain-Controller",
+      "riskLevel": "Critical",
+      "attackTechnique": "Clone a virtual DC → obtain a full copy of the NTDS.dit including all password hashes and the KRBTGT hash → Golden Ticket possible",
+      "knownTools": [
+        "Custom PowerShell",
+        "ntdsutil"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/002/"
+    },
+    {
+      "id": "a031ef91-daeb-4af3-809a-771e01b97e34",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Add-GUID",
+      "riskLevel": "High",
+      "attackTechnique": "Add new GUIDs to schema objects",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-add-guid"
+    },
+    {
+      "id": "cace71e4-21fa-40b9-9a0c-5ea5d840d951",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Change-Rid-Master",
+      "riskLevel": "Critical",
+      "attackTechnique": "Transfer RID Master role",
+      "knownTools": [
+        "netdom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/"
+    },
+    {
+      "id": "1bcd4e06-e4b4-4474-9579-9d8991c30bdc",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Allocate-Rids",
+      "riskLevel": "Critical",
+      "attackTechnique": "Manipulate RID pool → SID collision possible",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-allocate-rids"
+    },
+    {
+      "id": "59874756-5875-4fa2-907c-4f4c9cec71e3",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Recalculate-Hierarchy",
+      "riskLevel": "Medium",
+      "attackTechnique": "Recalculate DIT hierarchy",
+      "knownTools": [
+        "LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-recalculate-hierarchy"
+    },
+    {
+      "id": "8a835f2b-948b-42cb-9240-2482fb09d1ba",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Do-Garbage-Collection",
+      "riskLevel": "Medium",
+      "attackTechnique": "Manually trigger garbage collection to prematurely purge tombstoned objects, destroying forensic evidence and preventing recovery of deleted AD objects (users, groups, OUs). Can be chained after an attack to erase traces of deleted backdoor accounts or manipulated group memberships.",
+      "knownTools": [
+        "LDAP",
+        "LDP.exe",
+        "PowerShell (AD module)",
+        "ldp_modify"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-do-garbage-collection"
+    },
+    {
+      "id": "f6525a3d-76db-4208-85eb-1663ed4a634c",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Manage-Optional-Features",
+      "riskLevel": "Critical",
+      "attackTechnique": "Enable AD features (e.g. Recycle Bin, LAPS)",
+      "knownTools": [
+        "PowerShell"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-manage-optional-features"
+    },
+    {
+      "id": "136372af-cc19-4255-99c5-762410a7ec02",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "DS-Install-Replica",
+      "riskLevel": "Critical",
+      "attackTechnique": "Install a replica DC → complete domain control",
+      "knownTools": [
+        "ntdsutil"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/002/"
+    },
+    {
+      "id": "e616f7a1-e461-48ba-a218-01024ab818f6",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Send-To",
+      "riskLevel": "Medium",
+      "attackTechnique": "Forwarding of messages",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "5b68946d-59ef-4468-bb62-0452511fcf04",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Receive-As",
+      "riskLevel": "High",
+      "attackTechnique": "Read a user's complete inbox",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "4067936b-4f08-4a4d-b74b-496362bdd824",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Send-As",
+      "riskLevel": "High",
+      "attackTechnique": "Send emails on behalf of another user (Exchange)",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "0d632820-6c9a-4665-bb4e-5a2aa91e8948",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Change-PDC",
+      "riskLevel": "Critical",
+      "attackTechnique": "Transfer PDC Emulator role",
+      "knownTools": [
+        "netdom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/"
+    },
+    {
+      "id": "ca886ada-0f68-4594-a7f1-dccc49b10750",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Migrate-SID-History",
+      "riskLevel": "Critical",
+      "attackTechnique": "Write SID history to arbitrary accounts → permanently assume another identity's access rights (SID history injection without NTDS access)",
+      "knownTools": [
+        "Mimikatz",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=1640"
+    },
+    {
+      "id": "fd12993e-8576-4ff7-b0ae-8a8580acb9b1",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "DS-Replication-Get-Changes-All",
+      "riskLevel": "Critical",
+      "attackTechnique": "Full DCSync (incl. KRBTGT hash → Golden Ticket)",
+      "knownTools": [
+        "Mimikatz",
+        "Impacket"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=1729"
+    },
+    {
+      "id": "f1c09fdf-7344-4f4b-9027-afdda4d85a34",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "DS-Replication-Get-Changes-In-Filtered-Set",
+      "riskLevel": "Critical",
+      "attackTechnique": "DCSync for filtered attributes (RODC bypass)",
+      "knownTools": [
+        "Mimikatz"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=1729"
+    },
+    {
+      "id": "f22a6fa4-aeff-4046-a396-393adfc9db86",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "User-Force-Change-Password",
+      "riskLevel": "Critical",
+      "attackTechnique": "Reset a user's password without knowing the old password",
+      "knownTools": [
+        "BloodHound",
+        "PowerView"
+      ],
+      "referenceURL": "https://bloodhound.specterops.io/resources/edges/force-change-password"
+    },
+    {
+      "id": "090d6219-a35a-4645-866f-41636c2c5cc7",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "DS-Replication-Synchronize",
+      "riskLevel": "Critical",
+      "attackTechnique": "Forces replication, enables sync manipulation; can be abused for DCShadow attacks",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1003/006/"
+    },
+    {
+      "id": "d7a135b1-41f1-4510-b4a5-ee3e3a67199a",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "DS-Replication-Manage-Topology",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulation of the replication topology; combined with DS-Replication-Synchronize enables DCShadow (register rogue DC)",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/"
+    },
+    {
+      "id": "e62e47e7-0ff9-485b-a6a1-788cb1c7433a",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Update-Password-Not-Required-Bit",
+      "riskLevel": "High",
+      "attackTechnique": "Set the PASSWD_NOTREQD flag (userAccountControl) → the account can exist without a password → an empty password may be usable for authentication",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-update-password-not-required-bit"
+    },
+    {
+      "id": "ee92a06b-eb6b-4868-aadc-50c38da953ae",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Enable-Per-User-Reversibly-Encrypted-Password",
+      "riskLevel": "Critical",
+      "attackTechnique": "Enable reversible password encryption for a single account → the next password change stores the password in reversible form → the plaintext password can be read from AD",
+      "knownTools": [
+        "Custom LDAP",
+        "LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-enable-per-user-reversibly-encrypted-password"
+    },
+    {
+      "id": "e7d4cbaf-8ded-4edb-8069-1ace1c5659bb",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Apply-Group-Policy",
+      "riskLevel": "High",
+      "attackTechnique": "Force GPO application → code execution via GPO",
+      "knownTools": [
+        "GPO-Abuse Tools"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    },
+    {
+      "id": "d2a8c344-c5e6-48b4-8575-40243488dc02",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Change-Schema-Master",
+      "riskLevel": "Critical",
+      "attackTechnique": "Transfer the Schema Master FSMO role → control schema changes → create persistent backdoors through new attributes or modified defaultSecurityDescriptors",
+      "knownTools": [
+        "netdom",
+        "PowerShell AD"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/"
+    },
+    {
+      "id": "5bc01112-17c6-4fb5-8ad4-6cd41200d5f8",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Certificate-AutoEnrollment",
+      "riskLevel": "High",
+      "attackTechnique": "Automatic certificate enrollment (ESC attacks)",
+      "knownTools": [
+        "Certify",
+        "Certipy"
+      ],
+      "referenceURL": "https://github.com/ly4k/Certipy"
+    },
+    {
+      "id": "641f9561-7287-4cd8-98d7-da54f86161ea",
+      "category": "Extended Rights / Control Plane",
+      "attribute": "Change-Infrastructure-Master",
+      "riskLevel": "Critical",
+      "attackTechnique": "Transfer the Infrastructure Master FSMO role to another DC → manipulate domain-wide infrastructure processing (SID/DN reference updates)",
+      "knownTools": [
+        "netdom",
+        "PowerShell AD"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/"
+    },
+    {
+      "id": "fcb52b0d-3aa9-4ea1-b094-1a1c9b676df9",
+      "category": "Fine-Grained Password Policies",
+      "attribute": "msDS-MinimumPasswordLength",
+      "riskLevel": "High",
+      "attackTechnique": "Set minimum length to 0 → allow trivial passwords",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "6f532453-7fb4-41b5-9c5c-ccae23151592",
+      "category": "Fine-Grained Password Policies",
+      "attribute": "msDS-PasswordComplexityEnabled",
+      "riskLevel": "High",
+      "attackTechnique": "Disable password complexity requirements",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "42539913-3e80-44c7-ab07-66fed7f887df",
+      "category": "Fine-Grained Password Policies",
+      "attribute": "msDS-LockoutThreshold",
+      "riskLevel": "Medium",
+      "attackTechnique": "Increase the account lockout threshold → make brute-force attacks easier",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "ddb2765c-7c85-4373-b41a-880b70607d7c",
+      "category": "Fine-Grained Password Policies",
+      "attribute": "msDS-LockoutObservationWindow",
+      "riskLevel": "Medium",
+      "attackTechnique": "Reduce the observation window → make brute-force attacks easier",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "c0950599-f3a2-4d48-97ad-1d6e4cfb2ba3",
+      "category": "Fine-Grained Password Policies",
+      "attribute": "msDS-MaximumPasswordAge",
+      "riskLevel": "Medium",
+      "attackTechnique": "Set max password age to 0 → passwords never expire",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1098/"
+    },
+    {
+      "id": "ddc7c0cb-7b36-4f5f-a687-b0a8ed8e97cf",
+      "category": "Fine-Grained Password Policies",
+      "attribute": "msDS-PasswordHistoryLength",
+      "riskLevel": "Medium",
+      "attackTechnique": "Set history to 0 → allow password reuse",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "51ab3251-2176-4fd6-b136-0706714d083b",
+      "category": "Fine-Grained Password Policies",
+      "attribute": "msDS-PasswordReversibleEncryptionEnabled",
+      "riskLevel": "Critical",
+      "attackTechnique": "Reversible encryption → the password can be read in plaintext",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1003/"
+    },
+    {
+      "id": "93a37b78-9833-4003-8f45-ce55c971ae46",
+      "category": "Fine-Grained Password Policies",
+      "attribute": "msDS-PSOAppliesTo",
+      "riskLevel": "High",
+      "attackTechnique": "Apply a PSO (Password Settings Object) directly to a user or group → enforce a weaker password policy (shorter length, no lockout) → make brute-force attacks easier",
+      "knownTools": [
+        "PowerShell AD",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/adac/introduction-to-active-directory-administrative-center-enhancements--level-100-#fine_grained_pswd_policy_mgmt"
+    },
+    {
+      "id": "17178f3e-0f8c-4bdd-aa50-91ea348a29e9",
+      "category": "Fine-Grained Password Policies",
+      "attribute": "msDS-PasswordSettingsLink",
+      "riskLevel": "High",
+      "attackTechnique": "Change the PSO link → apply a weaker password policy",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1098/"
+    },
+    {
+      "id": "b4024d88-c8aa-46f1-a4c9-7ed34ac2ca7a",
+      "category": "GenericAll / WriteDACL / WriteOwner",
+      "attribute": "GenericWrite",
+      "riskLevel": "Critical",
+      "attackTechnique": "Write arbitrary attributes: SPN (Kerberoasting), scriptPath (code exec), msDS-KeyCredentialLink (Shadow Credentials), member, gpLink",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "Write arbitrary attributes: SPN (Kerberoasting), scriptPath (code exec), msDS-KeyCredentialLink (Shadow Credentials)"
+        },
+        {
+          "object": "group",
+          "impact": "Write member attribute - join group"
+        },
+        {
+          "object": "computer",
+          "impact": "RBCD via msDS-AllowedToActOnBehalfOfOtherIdentity"
+        },
+        {
+          "object": "groupPolicyContainer",
+          "impact": "Overwrite GPO settings - code execution"
+        },
+        {
+          "object": "organizationalUnit",
+          "impact": "Write arbitrary OU attributes - manipulate gpLink - code execution on all objects in the OU"
+        },
+        {
+          "object": "domainDNS",
+          "impact": "Write domain attributes - manipulate gpLink at domain level, msDS-MachineAccountQuota, delegation settings"
+        }
+      ],
+      "knownTools": [
+        "BloodHound",
+        "Impacket",
+        "PowerView",
+        "Rubeus",
+        "SharpGPOAbuse",
+        "Whisker"
+      ],
+      "referenceURL": "https://bloodhound.specterops.io/resources/edges/generic-write"
+    },
+    {
+      "id": "6ca0de44-84ea-4e58-a6b3-bd455a93ce2f",
+      "category": "GenericAll / WriteDACL / WriteOwner",
+      "attribute": "WriteOwner",
+      "riskLevel": "Critical",
+      "attackTechnique": "Take object ownership - gain WriteDACL - escalate to GenericAll",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "Take object ownership - WriteDACL - GenericAll"
+        },
+        {
+          "object": "group",
+          "impact": "Take group ownership"
+        },
+        {
+          "object": "domainDNS",
+          "impact": "Take domain ownership"
+        },
+        {
+          "object": "computer",
+          "impact": "Take ownership - gain WriteDACL - RBCD attack or Shadow Credentials"
+        },
+        {
+          "object": "groupPolicyContainer",
+          "impact": "Take GPO ownership - WriteDACL - manipulate GPO content - code execution"
+        },
+        {
+          "object": "organizationalUnit",
+          "impact": "Take OU ownership - WriteDACL - GenericAll on all contained objects"
+        }
+      ],
+      "knownTools": [
+        "BloodHound",
+        "PowerView",
+        "Rubeus",
+        "SharpGPOAbuse"
+      ],
+      "referenceURL": "https://bloodhound.specterops.io/resources/edges/write-owner"
+    },
+    {
+      "id": "7da974b4-2478-40f5-87ce-593bfcea40bf",
+      "category": "GenericAll / WriteDACL / WriteOwner",
+      "attribute": "WriteDACL",
+      "riskLevel": "Critical",
+      "attackTechnique": "Add own ACEs to object DACL - grant GenericAll to self, enable DCSync, make membership writable",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "Add own ACEs - grant GenericAll to self"
+        },
+        {
+          "object": "group",
+          "impact": "Make membership writable"
+        },
+        {
+          "object": "domainDNS",
+          "impact": "Grant DCSync rights to self"
+        },
+        {
+          "object": "groupPolicyContainer",
+          "impact": "Grant GPO write rights to self"
+        },
+        {
+          "object": "organizationalUnit",
+          "impact": "Add own ACEs - grant GenericAll on the OU and all contained objects"
+        },
+        {
+          "object": "computer",
+          "impact": "Add own ACEs - grant RBCD or Shadow Credentials"
+        }
+      ],
+      "knownTools": [
+        "BloodHound",
+        "PowerView",
+        "Rubeus",
+        "SharpGPOAbuse",
+        "Whisker"
+      ],
+      "referenceURL": "https://bloodhound.specterops.io/resources/edges/write-dacl"
+    },
+    {
+      "id": "faef2fb7-e32a-428e-bd76-44bdba0c9f54",
+      "category": "GenericAll / WriteDACL / WriteOwner",
+      "attribute": "GenericAll",
+      "riskLevel": "Critical",
+      "attackTechnique": "Full object control: password reset, set SPN, write attributes, add members, manipulate GPOs, control OU or domain",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "Password reset, set SPN, write attributes"
+        },
+        {
+          "object": "group",
+          "impact": "Add arbitrary members including privileged groups"
+        },
+        {
+          "object": "computer",
+          "impact": "RBCD attack, SPN manipulation, computer account password reset"
+        },
+        {
+          "object": "groupPolicyContainer",
+          "impact": "Manipulate GPO content - code execution on all affected systems"
+        },
+        {
+          "object": "organizationalUnit",
+          "impact": "Control all objects in the OU"
+        },
+        {
+          "object": "domainDNS",
+          "impact": "Complete domain control"
+        }
+      ],
+      "knownTools": [
+        "BloodHound",
+        "Impacket",
+        "PowerView",
+        "Rubeus",
+        "SharpGPOAbuse"
+      ],
+      "referenceURL": "https://bloodhound.specterops.io/resources/edges/generic-all"
+    },
+    {
+      "id": "1df2f2a1-96f0-4fe5-afad-1dd82af09bd3",
+      "category": "Group Attributes",
+      "attribute": "member",
+      "riskLevel": "Critical",
+      "attackTechnique": "Add/remove members - privilege escalation via privileged groups; remove from Protected Users to lift Kerberos restrictions",
+      "appliesTo": [
+        {
+          "object": "group",
+          "impact": "Add/remove members - privilege escalation via privileged groups"
+        },
+        {
+          "object": "adminSDHolder",
+          "impact": "Remove from Protected Users - lift Kerberos restrictions"
+        }
+      ],
+      "knownTools": [
+        "BloodHound",
+        "Custom LDAP",
+        "PowerView"
+      ],
+      "referenceURL": "https://bloodhound.specterops.io/resources/edges/add-member"
+    },
+    {
+      "id": "23e87fbe-001f-42a1-897b-94b6052a8c30",
+      "category": "Group Attributes",
+      "attribute": "managedBy",
+      "riskLevel": "High",
+      "attackTechnique": "Manager can manage members (if 'Manager can update membership list' is enabled); identifies responsible parties for targeting",
+      "appliesTo": [
+        {
+          "object": "group",
+          "impact": "Manager can manage members (if 'Manager can update membership list' is enabled)"
+        },
+        {
+          "object": "computer",
+          "impact": "Documented responsibility - targeting"
+        },
+        {
+          "object": "organizationalUnit",
+          "impact": "Identify responsible parties - spear phishing"
+        }
+      ],
+      "knownTools": [
+        "Custom LDAP",
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-managedby"
+    },
+    {
+      "id": "7da7e0af-f918-42d0-90e3-39b69af16351",
+      "category": "Group Attributes",
+      "attribute": "groupType",
+      "riskLevel": "High",
+      "attackTechnique": "Change group type (e.g. Distribution → Security)",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-grouptype"
+    },
+    {
+      "id": "42a9d64d-f1b7-4275-8a2d-ffe4591e5ded",
+      "category": "Group Policy Objects",
+      "attribute": "gPCFileSysPath",
+      "riskLevel": "Critical",
+      "attackTechnique": "Path to GPO SYSVOL folder → manipulate scripts/settings",
+      "knownTools": [
+        "SharpGPOAbuse"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    },
+    {
+      "id": "cfc631a1-25d0-4f30-b61e-6f539c8d8bf3",
+      "category": "Group Policy Objects",
+      "attribute": "versionNumber",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate version number → force GPO replication",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    },
+    {
+      "id": "ced88e49-4b53-4e73-aaa3-2169b84d0831",
+      "category": "Group Policy Objects",
+      "attribute": "gPCMachineExtensionNames",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate CSE extensions → change execution behavior",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    },
+    {
+      "id": "d12f6afb-3333-4966-9047-9bf8bd21aad9",
+      "category": "Group Policy Objects",
+      "attribute": "gPCUserExtensionNames",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate user-side CSE",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    },
+    {
+      "id": "d55d59a7-0a84-48d8-941b-4db4eb5492f4",
+      "category": "Group Policy Objects",
+      "attribute": "displayName",
+      "riskLevel": "Low",
+      "attackTechnique": "Manipulate display name for obfuscation or social engineering",
+      "appliesTo": [
+        {
+          "object": "groupPolicyContainer",
+          "impact": "Obfuscate GPO name"
+        },
+        {
+          "object": "user",
+          "impact": "Manipulate the display name - social engineering, confusion; visible name in AD listings"
+        }
+      ],
+      "knownTools": [
+        "Custom",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1036/"
+    },
+    {
+      "id": "11ca8c25-f949-4267-b034-b85034333b54",
+      "category": "Group Policy Objects",
+      "attribute": "flags",
+      "riskLevel": "High",
+      "attackTechnique": "Disable GPO (flags=3) → bypass security policies",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    },
+    {
+      "id": "eb2ed0be-a03b-4e89-8a0a-213bedd11d17",
+      "category": "Group Policy Objects",
+      "attribute": "Generate Resultant Set of Policy",
+      "riskLevel": "Low",
+      "attackTechnique": "Allows RSoP planning (what-if) and logging (actually applied policies) for user/computer accounts; reconnaissance of effective GPO settings",
+      "knownTools": [
+        "GPMC",
+        "PowerShell"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-generate-rsop-planning"
+    },
+    {
+      "id": "0d6adb20-15b5-4d95-8613-e4f3257e08f6",
+      "category": "inetOrgPerson",
+      "attribute": "inetOrgPerson",
+      "riskLevel": "Medium",
+      "attackTechnique": "inetOrgPerson objects are RFC 2798-compatible user-like objects in AD; delegation on this class carries the same risks as user objects (password reset, attribute manipulation)",
+      "knownTools": [
+        "PowerShell AD",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/c-inetorgperson"
+    },
+    {
+      "id": "9ed0f648-f71b-45d6-9957-8f6fcf7c57ba",
+      "category": "Kerberos Delegation",
+      "attribute": "msKds-RootKeyData",
+      "riskLevel": "Critical",
+      "attackTechnique": "KDS root key → compute gMSA passwords offline",
+      "knownTools": [
+        "GoldenGMSA"
+      ],
+      "referenceURL": "https://github.com/Semperis/GoldenGMSA"
+    },
+    {
+      "id": "6188299e-7ced-4b90-b118-8971ef6cd203",
+      "category": "Kerberos Delegation",
+      "attribute": "msDS-AllowedToActOnBehalfOfOtherIdentity",
+      "riskLevel": "Critical",
+      "attackTechnique": "Resource-Based Constrained Delegation (RBCD) - S4U2Proxy - impersonation of arbitrary users, computer account takeover, lateral movement",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "RBCD - take over user account"
+        },
+        {
+          "object": "computer",
+          "impact": "RBCD attack - S4U2Proxy - impersonation of arbitrary users"
+        }
+      ],
+      "knownTools": [
+        "Impacket",
+        "Rubeus"
+      ],
+      "referenceURL": "https://specterops.io/blog/2018/10/25/another-word-on-delegation/"
+    },
+    {
+      "id": "ed00cd5e-bd09-473f-96d5-37e971571485",
+      "category": "Kerberos Delegation",
+      "attribute": "msDS-AllowedToDelegateTo",
+      "riskLevel": "Critical",
+      "attackTechnique": "Constrained delegation to arbitrary services - service impersonation on defined targets",
+      "knownTools": [
+        "Rubeus"
+      ],
+      "referenceURL": "https://specterops.io/blog/2018/10/25/another-word-on-delegation/"
+    },
+    {
+      "id": "6e09e2e8-b71e-425b-819b-d419e393113e",
+      "category": "Kerberos Delegation",
+      "attribute": "TrustedForDelegation",
+      "riskLevel": "Critical",
+      "attackTechnique": "Unconstrained delegation → capture TGT of all connecting users",
+      "knownTools": [
+        "Rubeus",
+        "SpoolSample"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1558/"
+    },
+    {
+      "id": "8739d324-ed6b-4f92-88ca-abf732e795e5",
+      "category": "Kerberos Delegation",
+      "attribute": "TrustedToAuthForDelegation",
+      "riskLevel": "Critical",
+      "attackTechnique": "Protocol transition (S4U2Self) → impersonate arbitrary user",
+      "knownTools": [
+        "Rubeus"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1558/"
+    },
+    {
+      "id": "45da961c-213a-45b1-81ba-0bee21aac14f",
+      "category": "LAPS",
+      "attribute": "msLAPS-PasswordExpirationTime",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate expiry time",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/identity/laps/laps-overview"
+    },
+    {
+      "id": "769489d2-fcd4-4570-80e1-2be4c4108668",
+      "category": "LAPS",
+      "attribute": "msLAPS-EncryptedPassword",
+      "riskLevel": "Critical",
+      "attackTechnique": "Encrypted LAPS password → decryption with kDSServiceAccount",
+      "knownTools": [
+        "BloodHound"
+      ],
+      "referenceURL": "https://github.com/leoloobeek/LAPSToolkit"
+    },
+    {
+      "id": "6080ffec-2f41-4e54-9798-944a5c8104ec",
+      "category": "LAPS",
+      "attribute": "msLAPS-Password",
+      "riskLevel": "Critical",
+      "attackTechnique": "Windows LAPS: encrypted/unencrypted local admin password",
+      "knownTools": [
+        "LAPS Viewer",
+        "BloodHound"
+      ],
+      "referenceURL": "https://github.com/leoloobeek/LAPSToolkit"
+    },
+    {
+      "id": "a35f758b-56b7-4cf7-9788-92a07a9c37e4",
+      "category": "LAPS",
+      "attribute": "ms-Mcs-AdmPwdExpirationTime",
+      "riskLevel": "High",
+      "attackTechnique": "Set expiry time far into the future → disable password rotation",
+      "knownTools": [
+        "LAPSToolkit"
+      ],
+      "referenceURL": "https://github.com/leoloobeek/LAPSToolkit"
+    },
+    {
+      "id": "9fa11be7-9349-43ed-aa42-38bbad084205",
+      "category": "LAPS",
+      "attribute": "ms-Mcs-AdmPwd",
+      "riskLevel": "Critical",
+      "attackTechnique": "Read local admin password in plaintext",
+      "knownTools": [
+        "LAPSToolkit",
+        "BloodHound"
+      ],
+      "referenceURL": "https://github.com/leoloobeek/LAPSToolkit"
+    },
+    {
+      "id": "c4e1eac8-4e48-4991-b3ed-7f5d3454e7e9",
+      "category": "LAPS",
+      "attribute": "msLAPS-EncryptedPasswordHistory",
+      "riskLevel": "High",
+      "attackTechnique": "Password history → old local admin passwords",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/identity/laps/laps-overview"
+    },
+    {
+      "id": "4caf6ef4-5644-49e6-88d2-a65990f497df",
+      "category": "Organizational Units",
+      "attribute": "DeleteChild",
+      "riskLevel": "High",
+      "attackTechnique": "Delete objects from OU → DoS",
+      "knownTools": [
+        "PowerShell AD"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1531/"
+    },
+    {
+      "id": "7575057c-f615-4210-b823-b4e8b229f1c2",
+      "category": "Organizational Units",
+      "attribute": "CreateChild",
+      "riskLevel": "Critical",
+      "attackTechnique": "Create new objects in container - new users, computers, GPOs, or DNS entries",
+      "appliesTo": [
+        {
+          "object": "organizationalUnit",
+          "impact": "Create new objects (user, computer, GPO) in OU"
+        },
+        {
+          "object": "dnsZone",
+          "impact": "Create new DNS entries - wildcard DNS (*) - intercept all requests"
+        }
+      ],
+      "knownTools": [
+        "Powermad",
+        "PowerShell AD"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1136/002/"
+    },
+    {
+      "id": "f83b5833-472b-48d6-a6cd-b86edd3e93b7",
+      "category": "Organizational Units",
+      "attribute": "ou",
+      "riskLevel": "Low",
+      "attackTechnique": "OU name → reconnaissance / naming",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1087/002/"
+    },
+    {
+      "id": "e94d3f85-46f5-42d3-bf7e-2bf85bf10cac",
+      "category": "Organizational Units",
+      "attribute": "gpOptions",
+      "riskLevel": "High",
+      "attackTechnique": "Block GPO inheritance → disable security GPOs",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    },
+    {
+      "id": "9ffb388f-2c07-42a2-b8ab-228260f8f1d3",
+      "category": "Organizational Units",
+      "attribute": "gpLink",
+      "riskLevel": "Critical",
+      "attackTechnique": "Link GPO to OU → code execution on all objects in the OU",
+      "knownTools": [
+        "SharpGPOAbuse"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    },
+    {
+      "id": "ff5c7710-8481-44a9-8445-f22ac273d859",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "dSCorePropagationData",
+      "riskLevel": "Medium",
+      "attackTechnique": "SDProp timestamp → determine AdminSDHolder execution time",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=1906"
+    },
+    {
+      "id": "1e59dd29-f9c4-4955-bd28-d13255a1eb20",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "sidHistory",
+      "riskLevel": "Critical",
+      "attackTechnique": "SID history injection → assume another identity's access rights",
+      "knownTools": [
+        "Mimikatz"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=1640"
+    },
+    {
+      "id": "695e683a-1416-40cd-9d4c-07aec70b817f",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "objectSid",
+      "riskLevel": "Critical",
+      "attackTechnique": "Direct SID access → derive permissions, SID spoofing",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1087/002/"
+    },
+    {
+      "id": "d4086040-0c5b-4631-adf0-7884d18eba59",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "primaryGroupID",
+      "riskLevel": "High",
+      "attackTechnique": "Change the primary group → bypass memberOf enumeration (hidden membership)",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1564/"
+    },
+    {
+      "id": "e2051a3a-2db6-4b61-a69a-6ee4d383c01b",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "replPropertyMetaData",
+      "riskLevel": "Medium",
+      "attackTechnique": "Replication metadata → change history without event logs",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1070/"
+    },
+    {
+      "id": "4156ded8-f043-493c-b87c-6c8c54dcdec0",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "msDS-RevealedList",
+      "riskLevel": "Medium",
+      "attackTechnique": "RODC: cached credentials → scope analysis",
+      "knownTools": [
+        "BloodHound"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=3592"
+    },
+    {
+      "id": "b7ff7006-449c-4958-9ab2-c8677c4bb9fe",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "tokenGroups",
+      "riskLevel": "Medium",
+      "attackTechnique": "All group SIDs including transitive memberships → permission analysis",
+      "knownTools": [
+        "LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1069/002/"
+    },
+    {
+      "id": "036ac1bf-3a48-495f-81c9-4eb87caef262",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "msDS-NeverRevealGroup",
+      "riskLevel": "Medium",
+      "attackTechnique": "RODC: manipulate the Never Reveal group",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=3592"
+    },
+    {
+      "id": "d3a193b1-f1d2-4da4-8ad6-4500504c56aa",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "msDS-ReplAttributeMetaData",
+      "riskLevel": "Medium",
+      "attackTechnique": "Attribute replication metadata",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1070/"
+    },
+    {
+      "id": "801c1ad2-e167-4692-be74-4142c9734f73",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "msDS-ReplValueMetaData",
+      "riskLevel": "Medium",
+      "attackTechnique": "Value replication metadata (linked attributes)",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1070/"
+    },
+    {
+      "id": "2c9a0452-6233-4a27-83e7-7fe710cc8e0d",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "isDeleted",
+      "riskLevel": "Medium",
+      "attackTechnique": "Read deleted objects (Recycle Bin) → analyze deleted accounts and groups",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1087/002/"
+    },
+    {
+      "id": "4493fda3-9032-4564-bf19-60196de74498",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "lastKnownParent",
+      "riskLevel": "Low",
+      "attackTechnique": "Last known container of deleted objects",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-lastknownparent"
+    },
+    {
+      "id": "3ada9b26-ffc7-46a2-b2a2-144b5ac795a5",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "ntPwdHistory",
+      "riskLevel": "Critical",
+      "attackTechnique": "NT password history → pass-the-hash with old hashes",
+      "knownTools": [
+        "Mimikatz"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1550/002/"
+    },
+    {
+      "id": "f37232f2-a136-4cc8-909b-79a20b76b820",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "lmPwdHistory",
+      "riskLevel": "Critical",
+      "attackTechnique": "LM password history → weak hash algorithms",
+      "knownTools": [
+        "Mimikatz"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1003/"
+    },
+    {
+      "id": "40ab33b3-63c7-408a-968c-1635bf631f52",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "supplementalCredentials",
+      "riskLevel": "Critical",
+      "attackTechnique": "Supplemental credentials (WDigest, Kerberos keys) → plaintext passwords may be recoverable",
+      "knownTools": [
+        "Mimikatz",
+        "LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1003/"
+    },
+    {
+      "id": "4e988b7f-a086-488a-bd6b-8de31246e0a9",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "msDS-KrbTgtLinkBl",
+      "riskLevel": "High",
+      "attackTechnique": "RODC: KrbTgt link → compromise the RODC-specific KrbTgt account",
+      "knownTools": [
+        "Mimikatz"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=3592"
+    },
+    {
+      "id": "8d3b04fa-e9b2-4137-86e8-320284fade69",
+      "category": "Other Security-Relevant Attributes",
+      "attribute": "msDS-RevealOnDemandGroup",
+      "riskLevel": "High",
+      "attackTechnique": "RODC: Reveal-On-Demand group → expand the RODC scope",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://adsecurity.org/?p=3592"
+    },
+    {
+      "id": "c9f3bb80-f842-49a7-a14b-f171727e5a5c",
+      "category": "Property Sets",
+      "attribute": "Personal-Information",
+      "riskLevel": "Low",
+      "attackTechnique": "Property set includes: givenName, sn, displayName, initials, telephoneNumber, mobile, streetAddress, l, st, co, postalCode, etc. → often delegated to HR systems; primary risk: PII exposure and social engineering / spear-phishing preparation",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-personal-information"
+    },
+    {
+      "id": "33b3ba0b-bb1d-4e1a-8a90-327ebb68b307",
+      "category": "Property Sets",
+      "attribute": "Private-Information",
+      "riskLevel": "Low",
+      "attackTechnique": "Property set includes: homePhone, pager, mobile, facsimileTelephoneNumber, otherTelephone → private contact details; the primary risk is PII exposure and vishing targeting",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-private-information"
+    },
+    {
+      "id": "11ab31d0-70a5-4f73-b3ab-cb88b1b54ca4",
+      "category": "Property Sets",
+      "attribute": "Membership",
+      "riskLevel": "Critical",
+      "attackTechnique": "Property set includes: member, memberOf → delegating this set allows reading and writing group membership → direct privilege escalation by adding users to privileged groups",
+      "knownTools": [
+        "PowerView",
+        "BloodHound"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-membership"
+    },
+    {
+      "id": "5f594dee-bf3b-4304-ae0e-be5aeb387c79",
+      "category": "Property Sets",
+      "attribute": "General-Information",
+      "riskLevel": "Medium",
+      "attackTechnique": "Property set includes: cn, description, displayName, physicalDeliveryOfficeName, telephoneNumber, wWWHomePage, etc. → write access to cn enables object renaming; description is often used for reconnaissance",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-general-information"
+    },
+    {
+      "id": "d24cd713-ee33-48c5-8bec-2affa676bae1",
+      "category": "Property Sets",
+      "attribute": "Logon-Information",
+      "riskLevel": "Critical",
+      "attackTechnique": "Property set includes: scriptPath, profilePath, homeDirectory, homeDrive → all UNC path-based attributes can be delegated at once → code execution (scriptPath) and credential capture (UNC paths via Responder)",
+      "knownTools": [
+        "Responder",
+        "Custom"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-logon-information"
+    },
+    {
+      "id": "a45a9b50-fec4-452f-a0df-cacb3d1312cf",
+      "category": "Property Sets",
+      "attribute": "Web-Information",
+      "riskLevel": "Low",
+      "attackTechnique": "Property set includes: wWWHomePage, url → the homepage URL can be manipulated → redirect to phishing pages depending on the client application",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-web-information"
+    },
+    {
+      "id": "03a194a3-1a7a-4ee0-90da-d99a74ab186a",
+      "category": "Property Sets",
+      "attribute": "Email-Information",
+      "riskLevel": "Medium",
+      "attackTechnique": "Property set includes: mail, proxyAddresses, mailNickname → email addresses can be manipulated → mail spoofing preparation and phishing targeting",
+      "knownTools": [
+        "Exchange EMS",
+        "LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-email-information"
+    },
+    {
+      "id": "c782e26a-f85a-4488-872e-bd48a37df79c",
+      "category": "Property Sets",
+      "attribute": "Remote-Access-Information",
+      "riskLevel": "Medium",
+      "attackTechnique": "Property set includes: msNPAllowDialin, msNPCallingStationID, userParameters (Terminal Services) → enable dial-in permissions and manipulate Terminal Services configuration",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-remote-access-information"
+    },
+    {
+      "id": "80805a36-5556-495d-a0c9-d1d47a271a66",
+      "category": "Property Sets",
+      "attribute": "User-Account-Restrictions",
+      "riskLevel": "High",
+      "attackTechnique": "Property set includes: userAccountControl, logonHours, userWorkstations, accountExpires, etc. → delegation allows account control (enable/disable, disable pre-auth → AS-REP roasting, enable delegation)",
+      "knownTools": [
+        "Impacket GetNPUsers",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-user-account-restrictions"
+    },
+    {
+      "id": "fa458716-fb31-4a8c-8f0c-e27fa1434f06",
+      "category": "Property Sets",
+      "attribute": "Computer-Password",
+      "riskLevel": "Critical",
+      "attackTechnique": "Property set includes: Reset Password (extended right) on a computer account → reset the computer account password → Kerberoasting of the computer account, Silver Ticket abuse",
+      "knownTools": [
+        "Rubeus",
+        "Impacket"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/r-computer-password"
+    },
+    {
+      "id": "0f9d4fcb-a8b7-4e52-a8c9-8ab0496d2857",
+      "category": "Property Sets",
+      "attribute": "DNS-Host-Name-Attributes",
+      "riskLevel": "High",
+      "attackTechnique": "Property set includes: dNSHostName, msDS-AdditionalDnsHostName, servicePrincipalName → delegation allows DNS name and SPN manipulation → noPac variant, Kerberoasting, and Silver Ticket abuse",
+      "knownTools": [
+        "Custom LDAP",
+        "Rubeus",
+        "noPac PoC"
+      ],
+      "referenceURL": "https://www.thehacker.recipes/ad/movement/kerberos/samaccountname-spoofing"
+    },
+    {
+      "id": "9a4cf6de-60dc-4f6e-bcd2-af2e89496c4e",
+      "category": "Rename / Move Attribute",
+      "attribute": "cn",
+      "riskLevel": "Medium",
+      "attackTechnique": "Change the Common Name → rename the object; the basis for moving objects (Move-Object). Enables noPac preparation in combination with sAMAccountName changes",
+      "knownTools": [
+        "PowerShell AD",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://www.thehacker.recipes/ad/movement/kerberos/samaccountname-spoofing"
+    },
+    {
+      "id": "7292a068-824f-4039-a695-b2896f2b1e33",
+      "category": "Rename / Move Attribute",
+      "attribute": "distinguishedName",
+      "riskLevel": "Medium",
+      "attackTechnique": "Write the distinguishedName → allows moving objects between OUs (in combination with CreateChild/DeleteChild on the scope)",
+      "knownTools": [
+        "PowerShell AD",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-distinguishedname"
+    },
+    {
+      "id": "b372f0cb-538d-405a-9a0c-ff20c384caf3",
+      "category": "Rename / Move Attribute",
+      "attribute": "name",
+      "riskLevel": "Medium",
+      "attackTechnique": "Change the RDN name (name attribute) → directly rename the object in the AD tree; required for Move-Object operations",
+      "knownTools": [
+        "PowerShell AD",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-name"
+    },
+    {
+      "id": "9f16dc0d-6bb6-451b-9637-232dccac522d",
+      "category": "Schema & Configuration",
+      "attribute": "schemaIDGuid",
+      "riskLevel": "High",
+      "attackTechnique": "Manipulate schema GUID → DACL bypass",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-schemaidguid"
+    },
+    {
+      "id": "cec16478-75f2-493c-8d37-8b5b876d1f75",
+      "category": "Schema & Configuration",
+      "attribute": "defaultSecurityDescriptor",
+      "riskLevel": "Critical",
+      "attackTechnique": "Default DACL for new objects → plant a backdoor in all new objects",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-defaultsecuritydescriptor"
+    },
+    {
+      "id": "958ab3b6-720d-4da8-bf24-6d72abab52e2",
+      "category": "Schema & Configuration",
+      "attribute": "attributeSecurityGuid",
+      "riskLevel": "High",
+      "attackTechnique": "Property set membership → bypass access control",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-attributesecurityguid"
+    },
+    {
+      "id": "a1dab6bc-58b6-41fc-b473-c67a6e063bd0",
+      "category": "Schema & Configuration",
+      "attribute": "rightsGuid",
+      "riskLevel": "High",
+      "attackTechnique": "Extended-right GUID → define custom extended rights",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-rightsguid"
+    },
+    {
+      "id": "5e551c3b-2a5a-4f66-bb85-026a0f27137b",
+      "category": "Schema & Configuration",
+      "attribute": "systemFlags",
+      "riskLevel": "High",
+      "attackTechnique": "System attribute flags → remove deletion protection",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-systemflags"
+    },
+    {
+      "id": "f320e33e-b5ff-48a1-a23f-08f08a87a2ba",
+      "category": "Schema & Configuration",
+      "attribute": "isCriticalSystemObject",
+      "riskLevel": "High",
+      "attackTechnique": "Remove the critical-system flag → make the object deletable",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-iscriticalsystemobject"
+    },
+    {
+      "id": "3eb6ef9d-1fb1-4842-b3f5-8cbc4c2a6752",
+      "category": "Service Accounts & Managed Service Accounts",
+      "attribute": "msDS-ManagedPasswordPreviousId",
+      "riskLevel": "Medium",
+      "attackTechnique": "Previous password ID → reconstruct older passwords",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://github.com/Semperis/GoldenGMSA"
+    },
+    {
+      "id": "7619cb4f-6445-4f1a-9254-bab5e8bd5b47",
+      "category": "Service Accounts & Managed Service Accounts",
+      "attribute": "msDS-ManagedPasswordInterval",
+      "riskLevel": "Medium",
+      "attackTechnique": "Extend the rotation interval → keep the password valid longer",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows-server/security/group-managed-service-accounts/group-managed-service-accounts-overview"
+    },
+    {
+      "id": "7b510ae7-6812-48ab-88a6-7b9ba72551db",
+      "category": "Service Accounts & Managed Service Accounts",
+      "attribute": "msDS-GroupMSAMembership",
+      "riskLevel": "Critical",
+      "attackTechnique": "Who can read the gMSA password - add a member to gain access",
+      "knownTools": [
+        "BloodHound"
+      ],
+      "referenceURL": "https://github.com/micah-isles/GMSAPasswordReader"
+    },
+    {
+      "id": "5e4d4f50-1207-44af-8fa4-f3591f64c4f7",
+      "category": "Service Accounts & Managed Service Accounts",
+      "attribute": "msDS-ManagedPassword",
+      "riskLevel": "Critical",
+      "attackTechnique": "gMSA password - automatically rotating password readable by authorized principals",
+      "knownTools": [
+        "GMSAPasswordReader"
+      ],
+      "referenceURL": "https://github.com/micah-isles/GMSAPasswordReader"
+    },
+    {
+      "id": "4c9bdbfb-fe34-4fba-b037-3d01ab04fac1",
+      "category": "Service Accounts & Managed Service Accounts",
+      "attribute": "msDS-ManagedPasswordId",
+      "riskLevel": "Medium",
+      "attackTechnique": "Managed password ID → KDS key derivation",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://github.com/Semperis/GoldenGMSA"
+    },
+    {
+      "id": "4d917f97-5eb8-4ee4-9dc6-0e73533b85c5",
+      "category": "User Attributes",
+      "attribute": "homeDirectory",
+      "riskLevel": "High",
+      "attackTechnique": "UNC path → credential capture (LLMNR/NBT-NS)",
+      "knownTools": [
+        "Responder"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1187/"
+    },
+    {
+      "id": "a107146a-66d3-409f-b93f-aae19be579c8",
+      "category": "User Attributes",
+      "attribute": "profilePath",
+      "riskLevel": "High",
+      "attackTechnique": "UNC path for profile → credential capture (LLMNR/NBT-NS)",
+      "knownTools": [
+        "Responder"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1187/"
+    },
+    {
+      "id": "6baa7b6c-d4c1-4b6b-bcae-88a0a0f5c8b7",
+      "category": "User Attributes",
+      "attribute": "scriptPath",
+      "riskLevel": "Critical",
+      "attackTechnique": "Logon script path → code execution at next login",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1037/003/"
+    },
+    {
+      "id": "d7321bff-4c98-4fa4-8d63-5e99dfdde468",
+      "category": "User Attributes",
+      "attribute": "altSecurityIdentities",
+      "riskLevel": "Critical",
+      "attackTechnique": "Alternative identities (certificates/Kerberos) → authentication bypass",
+      "knownTools": [
+        "Certipy",
+        "Whisker"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/shadow-credentials-abusing-key-trust-account-mapping-for-account-takeover/"
+    },
+    {
+      "id": "f04d9dc2-35c2-419b-89a6-e577ed31c18c",
+      "category": "User Attributes",
+      "attribute": "servicePrincipalName",
+      "riskLevel": "High",
+      "attackTechnique": "Set SPN - enable Kerberoasting of the account; add SPNs for Silver Ticket attacks",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "Set SPN - enable Kerberoasting of the account"
+        },
+        {
+          "object": "computer",
+          "impact": "Add SPNs - Kerberoasting, Silver Ticket"
+        }
+      ],
+      "knownTools": [
+        "Impacket",
+        "Rubeus"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1558/003/"
+    },
+    {
+      "id": "227434ea-6017-40a5-978d-bb9e951bbab3",
+      "category": "User Attributes",
+      "attribute": "userAccountControl",
+      "riskLevel": "Critical",
+      "attackTechnique": "Enable/disable account, disable pre-auth (AS-REP Roasting), enable delegation, set TRUSTED_FOR_DELEGATION",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "Enable/disable account, disable pre-auth (AS-REP Roasting), enable delegation"
+        },
+        {
+          "object": "computer",
+          "impact": "Set TRUSTED_FOR_DELEGATION - unconstrained delegation attack; set DONT_REQ_PREAUTH - AS-REP Roasting of computer account"
+        }
+      ],
+      "knownTools": [
+        "Impacket GetNPUsers",
+        "Rubeus"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1558/004/"
+    },
+    {
+      "id": "1730079e-040d-423d-8588-2d093c23d16f",
+      "category": "User Attributes",
+      "attribute": "pwdLastSet",
+      "riskLevel": "Medium",
+      "attackTechnique": "Set to 0 - force password change at next logon; set to -1 - password appears freshly set (reset expiry timer)",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "Set to 0 - force password change at next logon; set to -1 - password appears freshly set"
+        },
+        {
+          "object": "computer",
+          "impact": "Computer account password age - old hashes via NTLM; reset to 0 to force machine account password change"
+        }
+      ],
+      "knownTools": [
+        "Custom",
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-pwdlastset"
+    },
+    {
+      "id": "b15462b8-77b2-48f6-87e1-467f5442c93b",
+      "category": "User Attributes",
+      "attribute": "unicodePwd",
+      "riskLevel": "Critical",
+      "attackTechnique": "Read/set NT hash",
+      "knownTools": [
+        "Impacket",
+        "Mimikatz"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1003/"
+    },
+    {
+      "id": "dc36a2dd-5c72-480a-a5a7-e0a6a1aa16cd",
+      "category": "User Attributes",
+      "attribute": "givenName",
+      "riskLevel": "Low",
+      "attackTechnique": "First name → PII exposure; can be used for spear-phishing in combination with other attributes",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "37eca856-467b-48c5-8200-492b9bea4a3a",
+      "category": "User Attributes",
+      "attribute": "sn",
+      "riskLevel": "Low",
+      "attackTechnique": "Last name (surname) → PII exposure; org chart reconnaissance",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "f2a43d4b-4d22-49c0-b80a-8bccb54c9f33",
+      "category": "User Attributes",
+      "attribute": "initials",
+      "riskLevel": "Low",
+      "attackTechnique": "Initials → PII exposure; part of the naming scheme in many organizations",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "6ea8f3ff-208b-4623-b196-d86345dfb3fb",
+      "category": "User Attributes",
+      "attribute": "department",
+      "riskLevel": "Low",
+      "attackTechnique": "Department → org chart reconnaissance; spear-phishing targeting by department (e.g., Finance, IT)",
+      "knownTools": [
+        "LDAP Enum",
+        "BloodHound"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "09bc16d9-2746-485b-a422-ab5e20922baa",
+      "category": "User Attributes",
+      "attribute": "title",
+      "riskLevel": "Low",
+      "attackTechnique": "Job title → spear-phishing targeting (e.g., CFO, CISO); identification of highly privileged individuals",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "a8ca3e11-fd17-4854-ad28-7809d661fe2f",
+      "category": "User Attributes",
+      "attribute": "employeeID",
+      "riskLevel": "Low",
+      "attackTechnique": "Employee ID → identity correlation across systems; usable for account takeover in HR integration scenarios",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "e2b1f0b7-ba34-499c-a2c0-66a7de151765",
+      "category": "User Attributes",
+      "attribute": "employeeNumber",
+      "riskLevel": "Low",
+      "attackTechnique": "Employee number → identity correlation; analogous to employeeID",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "6b7a01c8-6ff8-4ec8-94e4-9db4dc92028e",
+      "category": "User Attributes",
+      "attribute": "employeeType",
+      "riskLevel": "Low",
+      "attackTechnique": "Employee type (e.g., contractor, employee) → classification for targeted attacks on less-monitored accounts",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "da98187c-154f-44a9-9a57-e18067e16dfe",
+      "category": "User Attributes",
+      "attribute": "mobile",
+      "riskLevel": "Low",
+      "attackTechnique": "Mobile phone number → vishing/SMS phishing targeting; MFA bypass preparation (SIM swapping)",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "915a70ce-9c5e-4d26-a563-3774eb641b22",
+      "category": "User Attributes",
+      "attribute": "homePhone",
+      "riskLevel": "Low",
+      "attackTechnique": "Home phone number → vishing targeting; PII exposure",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "e2e319a4-417e-45d6-a006-cfc504c9def1",
+      "category": "User Attributes",
+      "attribute": "pager",
+      "riskLevel": "Low",
+      "attackTechnique": "Pager number → PII exposure; still used as a secondary contact method in some environments",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "81647438-1538-43b9-a487-ffddc48b1af5",
+      "category": "User Attributes",
+      "attribute": "streetAddress",
+      "riskLevel": "Low",
+      "attackTechnique": "Street address → PII exposure; physical social engineering / tailgating preparation",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "a7f51f86-1a5d-4aa0-9ad6-8f82aef2cd73",
+      "category": "User Attributes",
+      "attribute": "l",
+      "riskLevel": "Low",
+      "attackTechnique": "City (locality) → PII exposure; location-based reconnaissance",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "8ae06123-d978-425c-81a7-938ece397c0e",
+      "category": "User Attributes",
+      "attribute": "st",
+      "riskLevel": "Low",
+      "attackTechnique": "State/region → PII; location reconnaissance",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "f74e4666-a25d-4905-bcf0-3bd8f76a48a4",
+      "category": "User Attributes",
+      "attribute": "postalCode",
+      "riskLevel": "Low",
+      "attackTechnique": "Postal code → PII; a full address can be reconstructed in combination with other fields",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "d05c462f-3383-40e8-8d53-14e552c86bd6",
+      "category": "User Attributes",
+      "attribute": "co",
+      "riskLevel": "Low",
+      "attackTechnique": "Country (text field) → PII; geographic mapping for location-based attacks",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "93815624-a2a1-42b3-a51b-26471cb52a58",
+      "category": "User Attributes",
+      "attribute": "userPassword",
+      "riskLevel": "Critical",
+      "attackTechnique": "Directly read/set password",
+      "knownTools": [
+        "LDAP",
+        "ldapsearch"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1003/"
+    },
+    {
+      "id": "d3a2c37c-8d06-48a6-a0b8-fd7ac753189f",
+      "category": "User Attributes",
+      "attribute": "company",
+      "riskLevel": "Low",
+      "attackTechnique": "Company name → PII; relevant for Entra ID sync in hybrid scenarios",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "3edaf426-d821-4436-94c0-359033312cb6",
+      "category": "User Attributes",
+      "attribute": "homeDrive",
+      "riskLevel": "Medium",
+      "attackTechnique": "Drive letter for home directory",
+      "knownTools": [],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "d41da2d7-7318-48c4-95c9-c35d551a8c44",
+      "category": "User Attributes",
+      "attribute": "userWorkstations",
+      "riskLevel": "Medium",
+      "attackTechnique": "Restrict or manipulate logon workstations",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-userworkstations"
+    },
+    {
+      "id": "2163666f-d434-456e-80b9-413f7f8f30f4",
+      "category": "User Attributes",
+      "attribute": "accountExpires",
+      "riskLevel": "Medium",
+      "attackTechnique": "Disable account expiry (0 = never expire)",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-accountexpires"
+    },
+    {
+      "id": "ae64f473-7654-40b4-a21b-1f28adf4dd57",
+      "category": "User Attributes",
+      "attribute": "msDS-KeyCredentialLink",
+      "riskLevel": "Critical",
+      "attackTechnique": "Shadow Credentials - certificate-based authentication without password",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "Shadow Credentials - certificate-based authentication without password"
+        },
+        {
+          "object": "computer",
+          "impact": "Shadow Credentials on computer account"
+        }
+      ],
+      "knownTools": [
+        "Certipy",
+        "Whisker"
+      ],
+      "referenceURL": "https://specterops.io/blog/2021/06/17/shadow-credentials-abusing-key-trust-account-mapping-for-account-takeover/"
+    },
+    {
+      "id": "6df11921-ef2a-48e9-bb04-c8bb699e49f6",
+      "category": "User Attributes",
+      "attribute": "msDS-SupportedEncryptionTypes",
+      "riskLevel": "High",
+      "attackTechnique": "Force RC4 downgrade - facilitate Kerberoasting; remove AES to force weaker encryption",
+      "knownTools": [
+        "Rubeus"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1558/003/"
+    },
+    {
+      "id": "43dcde18-62b9-46cd-a68c-f35f0987bfd7",
+      "category": "User Attributes",
+      "attribute": "userPrincipalName",
+      "riskLevel": "High",
+      "attackTechnique": "Change UPN suffix → authentication bypass in certain scenarios",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1098/"
+    },
+    {
+      "id": "17ad0c4d-cc20-4bef-9a0c-38f098ae5ccb",
+      "category": "User Attributes",
+      "attribute": "sAMAccountType",
+      "riskLevel": "Medium",
+      "attackTechnique": "Account type manipulation",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-samaccounttype"
+    },
+    {
+      "id": "1b24bde8-a402-41dc-9417-8cbe2a79f0c6",
+      "category": "User Attributes",
+      "attribute": "adminDisplayName",
+      "riskLevel": "Low",
+      "attackTechnique": "Manipulate the display name → confusion/social engineering; no direct escalation potential",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "49dc37db-235d-4e70-b34e-37180acfd36d",
+      "category": "User Attributes",
+      "attribute": "physicalDeliveryOfficeName",
+      "riskLevel": "Low",
+      "attackTechnique": "Manipulate the office location → reconnaissance / social engineering",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "d104d9c5-43cf-443a-9ccc-de3101e88fe8",
+      "category": "User Attributes",
+      "attribute": "telephoneNumber",
+      "riskLevel": "Low",
+      "attackTechnique": "Phone number → phishing/vishing targeting",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "7fb44acc-16af-4c21-8767-d14467bb9da8",
+      "category": "User Attributes",
+      "attribute": "wWWHomePage",
+      "riskLevel": "Low",
+      "attackTechnique": "Manipulate the homepage URL → redirect to a phishing page may be possible (depending on the client application)",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "8b5b30d1-eb2c-4b4e-8309-4515428fbd65",
+      "category": "User Attributes",
+      "attribute": "sAMAccountName",
+      "riskLevel": "High",
+      "attackTechnique": "Rename - noPac attack (CVE-2021-42278/42287); change group name for confusion",
+      "appliesTo": [
+        {
+          "object": "user",
+          "impact": "Rename - noPac attack (CVE-2021-42278/42287)"
+        },
+        {
+          "object": "group",
+          "impact": "Change group name - confusion, complicate reconnaissance"
+        }
+      ],
+      "knownTools": [
+        "Custom LDAP",
+        "noPac PoC"
+      ],
+      "referenceURL": "https://www.thehacker.recipes/ad/movement/kerberos/samaccountname-spoofing"
+    },
+    {
+      "id": "fecf6762-3854-4353-a6d2-105016957c8d",
+      "category": "User Attributes",
+      "attribute": "msDS-PrincipalName",
+      "riskLevel": "Medium",
+      "attackTechnique": "Full principal name → reconnaissance",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1087/002/"
+    },
+    {
+      "id": "09fe4542-3d41-4ebe-b0ad-aa681d280572",
+      "category": "User Attributes",
+      "attribute": "msDS-UserPasswordExpiryTimeComputed",
+      "riskLevel": "Medium",
+      "attackTechnique": "Computed expiry time → identify attack windows",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1087/002/"
+    },
+    {
+      "id": "c26082a3-b211-4787-b860-2567f335052b",
+      "category": "User Attributes",
+      "attribute": "directReports",
+      "riskLevel": "Medium",
+      "attackTechnique": "Direct reports → org chart reconnaissance",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "9fff19c4-62c9-43c6-8a2c-32da8ce49b1e",
+      "category": "User Attributes",
+      "attribute": "manager",
+      "riskLevel": "Medium",
+      "attackTechnique": "Manager reference → org chart reconnaissance for spear phishing",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/"
+    },
+    {
+      "id": "f4b84a90-c05c-4054-863a-d9e22ff5bee5",
+      "category": "User Attributes",
+      "attribute": "description",
+      "riskLevel": "Low",
+      "attackTechnique": "Often contains passwords/hints in plaintext (misconfiguration); reveals function/access information for reconnaissance",
+      "knownTools": [
+        "BloodHound",
+        "LDAP Enum",
+        "ldapsearch"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1552/001/"
+    },
+    {
+      "id": "493f432e-11f6-40f8-8389-e749492d4a68",
+      "category": "User Attributes",
+      "attribute": "info",
+      "riskLevel": "Low",
+      "attackTechnique": "Notes field → store credentials in plaintext (misconfiguration)",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1552/001/"
+    },
+    {
+      "id": "45acfb35-8a59-44db-948a-1e048a0fa7ca",
+      "category": "User Attributes",
+      "attribute": "thumbnailPhoto",
+      "riskLevel": "Low",
+      "attackTechnique": "No direct attack potential, but usable as data store for malware (steganography)",
+      "knownTools": [
+        "Custom"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1027/"
+    },
+    {
+      "id": "b038c6d0-36d3-4651-8ed2-2001f166710b",
+      "category": "User Attributes",
+      "attribute": "msExchRecipientDisplayType",
+      "riskLevel": "Medium",
+      "attackTechnique": "Manipulate recipient type",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "deec5ec3-6a0d-4ae5-ae7f-ba08af9b93f5",
+      "category": "User Attributes",
+      "attribute": "msExchMailboxGuid",
+      "riskLevel": "Medium",
+      "attackTechnique": "Exchange mailbox GUID → prepare mailbox access",
+      "knownTools": [
+        "Exchange EMS"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1114/"
+    },
+    {
+      "id": "065cae79-6051-4cff-88d6-ffabfbf00f7d",
+      "category": "User Attributes",
+      "attribute": "proxyAddresses",
+      "riskLevel": "Medium",
+      "attackTechnique": "Additional email addresses → prepare mail spoofing",
+      "knownTools": [
+        "Exchange"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/002/"
+    },
+    {
+      "id": "73d4d29d-5e41-4ff4-9623-3e43e3978203",
+      "category": "User Attributes",
+      "attribute": "mail",
+      "riskLevel": "Low",
+      "attackTechnique": "Email address → phishing targeting",
+      "knownTools": [
+        "LDAP Enum"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1589/002/"
+    },
+    {
+      "id": "f7eb5597-2859-4458-88bc-591f3ea01bb0",
+      "category": "User Attributes",
+      "attribute": "memberOf",
+      "riskLevel": "Medium",
+      "attackTechnique": "Read group memberships (reconnaissance)",
+      "knownTools": [
+        "BloodHound",
+        "ldapsearch"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1069/002/"
+    },
+    {
+      "id": "dcace416-9993-4f5e-911b-015b9b15b55f",
+      "category": "User Attributes",
+      "attribute": "lockoutTime",
+      "riskLevel": "Medium",
+      "attackTechnique": "Manually lock or unlock account",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "4d97900c-2d49-4da6-a0cb-fd5ff5449208",
+      "category": "User Attributes",
+      "attribute": "badPwdCount",
+      "riskLevel": "Medium",
+      "attackTechnique": "Reset failed attempts → bypass brute-force protection",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "45070c16-e3c1-4aca-9605-c5b70fe87c14",
+      "category": "User Attributes",
+      "attribute": "badPasswordTime",
+      "riskLevel": "Medium",
+      "attackTechnique": "Manipulate lockout counter",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1110/"
+    },
+    {
+      "id": "db7734df-b5f7-475e-91a0-4f82f707fa85",
+      "category": "User Attributes",
+      "attribute": "logonHours",
+      "riskLevel": "Medium",
+      "attackTechnique": "Restrict or manipulate logon time periods",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-logonhours"
+    },
+    {
+      "id": "76b8b1cf-9c2a-4e19-ac25-fca923454bb9",
+      "category": "User Attributes",
+      "attribute": "userParameters",
+      "riskLevel": "Medium",
+      "attackTechnique": "Terminal Services and dial-in parameters (msNPAllowDialin, logon script via RAS, Citrix settings) → enable dial-in access, manipulate Terminal Services behavior; contains binary structures evaluated by RAS/Citrix",
+      "knownTools": [
+        "Custom LDAP"
+      ],
+      "referenceURL": "https://learn.microsoft.com/en-us/windows/win32/adschema/a-userparameters"
+    },
+    {
+      "id": "5cc0bab9-d0fb-437f-8a0c-3ff563d83ead",
+      "category": "WMI Filter",
+      "attribute": "msWMI-Som",
+      "riskLevel": "Medium",
+      "attackTechnique": "Create, delete, or fully control WMI filters → WMI filters determine which computers a GPO applies to; manipulated filters can expand or restrict GPO targeting",
+      "knownTools": [
+        "GPMC",
+        "PowerShell"
+      ],
+      "referenceURL": "https://attack.mitre.org/techniques/T1484/001/"
+    }
+  ]
+}

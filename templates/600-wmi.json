@@ -1,5 +1,7 @@
 {
   "ID": "600",
+  "Category": "Account Lifecycle",
+  "ObjectClass": "WMI",
   "AppliesToClasses": "container",
   "Description": "Create, Delete, and Manage WMI Filters",
   "ObjectTypes": "SCOPE,msWMI-Som",
@@ -17,7 +19,17 @@
     {
       "ObjectType": "msWMI-Som",
       "Property": "@",
-      "Right": "GenericAll"
+      "Right": "ReadProperty"
+    },
+    {
+      "ObjectType": "msWMI-Som",
+      "Property": "@",
+      "Right": "WriteProperty"
+    },
+    {
+      "ObjectType": "msWMI-Som",
+      "Property": "@",
+      "Right": "Delete"
     }
   ]
 }
