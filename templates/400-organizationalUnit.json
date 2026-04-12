@@ -1,6 +1,8 @@
 [
   {
     "ID": "400",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "Organizational Unit",
     "AppliesToClasses": "domainDNS,organizationalUnit",
     "Description": "Create an Organizational Unit",
     "ObjectTypes": "SCOPE",
@@ -14,6 +16,8 @@
   },
   {
     "ID": "401",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "Organizational Unit",
     "AppliesToClasses": "domainDNS,organizationalUnit",
     "Description": "Delete a child Organizational Unit",
     "ObjectTypes": "SCOPE",
@@ -27,6 +31,8 @@
   },
   {
     "ID": "402",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "Organizational Unit",
     "AppliesToClasses": "organizationalUnit",
     "Description": "Delete this Organizational Unit",
     "ObjectTypes": "organizationalUnit",
@@ -40,6 +46,8 @@
   },
   {
     "ID": "403",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "Organizational Unit",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Rename an Organizational Unit",
     "ObjectTypes": "organizationalUnit",
@@ -53,11 +61,18 @@
         "ObjectType": "organizationalUnit",
         "Property": "name",
         "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "organizationalUnit",
+        "Property": "distinguishedName",
+        "Right": "WriteProperty"
       }
     ]
   },
   {
     "ID": "404",
+    "Category": "General",
+    "ObjectClass": "Organizational Unit",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify Description of an Organizational Unit",
     "ObjectTypes": "organizationalUnit",
@@ -71,6 +86,8 @@
   },
   {
     "ID": "405",
+    "Category": "General",
+    "ObjectClass": "Organizational Unit",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Modify Managed-By Information of an Organizational Unit",
     "ObjectTypes": "organizationalUnit",
@@ -84,6 +101,8 @@
   },
   {
     "ID": "406",
+    "Category": "Security",
+    "ObjectClass": "Organizational Unit",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Delegate Control of an Organizational Unit",
     "ObjectTypes": "organizationalUnit",

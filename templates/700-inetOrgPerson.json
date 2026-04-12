@@ -1,6 +1,7 @@
 [
   {
     "ID": "700",
+    "Category": "Account Lifecycle",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Create, delete, and manage inetOrgPerson accounts",
     "ObjectTypes": "SCOPE,inetOrgPerson",
@@ -18,12 +19,28 @@
       {
         "ObjectType": "inetOrgPerson",
         "Property": "@",
-        "Right": "GenericAll"
+        "Right": "ReadProperty"
+      },
+      {
+        "ObjectType": "inetOrgPerson",
+        "Property": "@",
+        "Right": "WriteProperty"
+      },
+      {
+        "ObjectType": "inetOrgPerson",
+        "Property": "@",
+        "Right": "Delete"
+      },
+      {
+        "ObjectType": "inetOrgPerson",
+        "Property": "Reset Password",
+        "Right": "ExtendedRight"
       }
     ]
   },
   {
     "ID": "701",
+    "Category": "Password",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Reset inetOrgPerson passwords and force password change at next logon",
     "ObjectTypes": "inetOrgPerson",
@@ -47,6 +64,7 @@
   },
   {
     "ID": "702",
+    "Category": "General",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
     "Description": "Read all inetOrgPerson information",
     "ObjectTypes": "inetOrgPerson",

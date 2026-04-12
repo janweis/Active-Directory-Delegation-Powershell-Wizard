@@ -1,6 +1,8 @@
 [
   {
     "ID": "500",
+    "Category": "Group Policy",
+    "ObjectClass": "Group Policy",
     "AppliesToClasses": "domainDNS,organizationalUnit,site",
     "Description": "Manage Group Policy links",
     "ObjectTypes": "SCOPE",
@@ -29,6 +31,8 @@
   },
   {
     "ID": "501",
+    "Category": "Group Policy",
+    "ObjectClass": "Group Policy",
     "AppliesToClasses": "domainDNS,organizationalUnit",
     "Description": "Generate Resultant Set of Policy (Planning)",
     "ObjectTypes": "SCOPE",
@@ -42,6 +46,8 @@
   },
   {
     "ID": "502",
+    "Category": "Group Policy",
+    "ObjectClass": "Group Policy",
     "AppliesToClasses": "domainDNS,organizationalUnit",
     "Description": "Generate Resultant Set of Policy (Logging)",
     "ObjectTypes": "SCOPE",

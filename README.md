@@ -1,13 +1,14 @@
-# 🧰 Active Directory Delegation PowerShell Wizard
+﻿# 🔐 Active Directory Delegation PowerShell Wizard
 
-> **Version:** v1.3-dev &nbsp;|&nbsp; **Last update:** 2026-02 &nbsp;|&nbsp; **Author:** Jan Weis
+> **Version:** v1.4-prod &nbsp;|&nbsp; **Last update:** 2026-04 &nbsp;|&nbsp; **Author:** Jan Weis
 
 Automate Active Directory delegation with reusable JSON templates.  
-Apply, audit, and revert permissions — consistently, transparently, and in seconds.
+Apply, audit, and revert permissions — consistently, transparently, and in seconds.  
+Context-aware security warnings protect against high-risk delegations.
 
 ---
 
-## ⚡ TL;DR — 3 commands to get started
+## ⚡ TL;DR — 4 commands to get started
 
 ```powershell
 # 1. List all available templates
@@ -28,19 +29,18 @@ Apply, audit, and revert permissions — consistently, transparently, and in sec
   -TemplatePath .\templates `
   -LogChanges `
   -LogPath "$env:USERPROFILE\DelegationLog.log"
+
+# 4. Adjust security warning threshold
+.\Invoke-ADDelegationTemplate.ps1 `
+  -Identity    "Contoso\Helpdesk-Berlin" `
+  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateIDs 100 `
+  -TemplatePath .\templates `
+  -WarnSeverity Critical
 ```
 
----
-
-## 🧾 Requirements
-
-| Requirement | Details |
-|---|---|
-| PowerShell | Version 3.0 or later |
-| Module | `ActiveDirectory` (RSAT or AD DS role) |
-| Permissions | Must be able to modify ACLs on the target OU/object |
-
----
+> 🛡️ **New in v1.4** — Every delegation is checked against a curated risk database.  
+> High-risk permissions trigger an interactive warning before they are applied.
 
 ## 📖 Parameters at a glance
 
@@ -50,10 +50,12 @@ Apply, audit, and revert permissions — consistently, transparently, and in sec
 | `-Path` | `string` | Target object in distinguishedName format (e.g. an OU) |
 | `-TemplateIDs` | `int[]` | One or more template IDs to apply |
 | `-TemplatePath` | `string` | Path to a JSON file **or** a directory of JSON files |
-| `-ShowTemplates` | `switch` | List all loaded templates |
+| `-ShowTemplates` | `switch` | List all loaded templates (grouped by Object Type → Category) |
 | `-IncludeDetails` | `switch` | Show rule details and source file per template |
 | `-LogChanges` | `switch` | Enable change logging (requires `-LogPath`) |
 | `-LogPath` | `string` | Path to the log file |
+| `-WarnSeverity` | `string` | Minimum risk level for security warnings: `Critical`, `High`, `Medium` (default), `Low` |
+| `-DisableSecurityWarning` | `switch` | Suppress all security warnings and the interactive confirmation prompt |
 
 > **Note:** If `-TemplatePath` is omitted, the script auto-loads from a `templates\` subdirectory next to the script.
 
@@ -64,7 +66,7 @@ Apply, audit, and revert permissions — consistently, transparently, and in sec
 ### Show available templates
 
 ```powershell
-# Overview (ID, description, source file)
+# Overview — grouped by Object Type and Category
 .\Invoke-ADDelegationTemplate.ps1 -ShowTemplates -TemplatePath .\templates
 
 # Detailed view (includes rules & AppliesTo info)
@@ -101,6 +103,41 @@ Apply, audit, and revert permissions — consistently, transparently, and in sec
   -LogPath "$env:USERPROFILE\DelegationLog.log"
 ```
 
+### Control security warnings
+
+```powershell
+# Only warn on Critical-risk delegations
+.\Invoke-ADDelegationTemplate.ps1 `
+  -Identity    "Helpdesk-Team" `
+  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateIDs 100 `
+  -TemplatePath .\templates `
+  -WarnSeverity Critical
+
+# Suppress warnings entirely (non-interactive / CI use)
+.\Invoke-ADDelegationTemplate.ps1 `
+  -Identity    "Helpdesk-Team" `
+  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
+  -TemplateIDs 100 `
+  -TemplatePath .\templates `
+  -DisableSecurityWarning
+```
+
+---
+
+## 🛡️ Security reference system
+
+`security\security-reference.json` contains a curated risk database for AD attributes and extended rights. When applying a template, the script matches each permission against this database (context-aware per object type) and displays warnings for entries that meet or exceed `-WarnSeverity` (default `Medium`). A `[Y/N]` prompt blocks until confirmed — use `-DisableSecurityWarning` to skip.
+
+### Risk levels
+
+| Level | Meaning |
+|---|---|
+| `Critical` | Direct domain or object takeover possible |
+| `High` | Privilege escalation or persistence possible |
+| `Medium` | Lateral movement or information disclosure |
+| `Low` | Low abuse potential |
+
 ---
 
 ## 🔄 Revert changes
@@ -110,9 +147,6 @@ Logged changes can be reviewed and reverted at any time:
 ```powershell
 # Show all logged changes
 Show-ADDelegationTemplateChanges -LogFilePath "$env:USERPROFILE\DelegationLog.log"
-
-# Show with formatted output
-Show-ADDelegationTemplateChanges -LogFilePath "$env:USERPROFILE\DelegationLog.log" -FormatOutput
 
 # Revert all logged changes
 Show-ADDelegationTemplateChanges -LogFilePath "$env:USERPROFILE\DelegationLog.log" | `
@@ -130,153 +164,35 @@ Show-ADDelegationTemplateChanges -LogFilePath "$env:USERPROFILE\DelegationLog.lo
 
 Templates are shipped as JSON files in the `templates\` folder:
 
-| File | Category | Examples |
+| File | Object Type | Examples |
 |---|---|---|
 | `100-user.json` | **User objects** | Reset password, edit properties, manage accounts |
 | `200-group.json` | **Group objects** | Manage membership, create/delete groups |
 | `300-computer.json` | **Computer objects** | Join domain, reset password |
 | `400-organizationalUnit.json` | **Organizational Units** | Create, rename, manage OUs |
-| `500-inetOrgPerson.json` | **inetOrgPerson** | LDAP / schema-based environments |
-| `600-groupPolicy.json` | **Group Policy** | Link/unlink GPOs, read RSoP |
-| `700-wmiFilters.json` | **WMI Filters** | Create, delete, assign WMI filters |
+| `500-groupPolicy.json` | **Group Policy** | Link/unlink GPOs, read RSoP |
+| `600-wmi.json` | **WMI Filters** | Create, delete, assign WMI filters |
+| `700-inetOrgPerson.json` | **inetOrgPerson** | LDAP / schema-based environments |
 
-> Use `-ShowTemplates -IncludeDetails` to see the exact template IDs and rules in each file.
-
----
-
-## 📝 Real-world examples
-
-### Scenario 1 — Helpdesk password reset
-
-The Berlin helpdesk team needs to reset user passwords in a specific OU:
-
-```powershell
-.\Invoke-ADDelegationTemplate.ps1 `
-  -Identity    "Contoso\Helpdesk-Berlin" `
-  -Path        "OU=UsersBerlin,DC=contoso,DC=local" `
-  -TemplateIDs 102 `
-  -TemplatePath .\templates
-```
-
-### Scenario 2 — Full user management with logging
-
-Grant a team full user management rights and log every change:
-
-```powershell
-.\Invoke-ADDelegationTemplate.ps1 `
-  -Identity    "UserAdmins" `
-  -Path        "OU=Users,OU=Corp,DC=contoso,DC=local" `
-  -TemplateIDs 101,102,103 `
-  -TemplatePath .\templates `
-  -LogChanges `
-  -LogPath "$env:USERPROFILE\DelegationLog.log"
-```
-
-### Scenario 3 — GPO link delegation
-
-Allow a group to link/unlink GPOs on an OU:
-
-```powershell
-.\Invoke-ADDelegationTemplate.ps1 `
-  -Identity    "GPO-Managers" `
-  -Path        "OU=Sites,DC=contoso,DC=local" `
-  -TemplateIDs 601 `
-  -TemplatePath .\templates
-```
+> Use `-ShowTemplates -IncludeDetails` to see the exact template IDs and rules in each file.  
+> JSON format, schema reference, and Rights migration guide → [`templates/README.md`](templates/README.md)
 
 ---
 
-## 📐 JSON template format
+## ⚠️ Breaking changes
 
-Each JSON file contains an array of templates:
+### v1.4-prod — Least-privilege & security warnings
 
-```json
-[
-  {
-    "ID": "101",
-    "Description": "User: read & write all properties",
-    "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "ObjectTypes": "SCOPE,user",
-    "Template": [
-      { "ObjectType": "user", "Property": "@",              "Right": "ReadProperty|WriteProperty" },
-      { "ObjectType": "user", "Property": "Reset Password", "Right": "ExtendedRight" }
-    ]
-  }
-]
-```
+- **`GenericAll` removed from default templates.** Templates like `100`, `200`, `300`, `600`, `700` now use granular rights (`ReadProperty|WriteProperty`, `CreateChild|DeleteChild`, etc.) instead of `GenericAll`. If you depend on `GenericAll`, create a custom template.
+- **Template ID renumbering.** Several IDs changed across template files (e.g. user templates expanded to `100`–`152`, group to `200`–`214`, computer to `300`–`312`). Compare with the CHANGELOG or run `-ShowTemplates` to verify your IDs.
+- **Interactive security confirmation.** When a template touches high-risk properties (as defined in `security-reference.json`), the script displays a warning and prompts `[Y/N]` before applying. For non-interactive or CI use, pass `-DisableSecurityWarning`.
+- **`Category` field required.** Templates now include a `Category` field used for grouped display in `-ShowTemplates`.
 
-| Key | Type | Description |
-|---|---|---|
-| `ID` | `string` | Unique template identifier |
-| `Description` | `string` | Human-readable description |
-| `AppliesToClasses` | `string` | Comma-separated AD object classes this template targets |
-| `ObjectTypes` | `string` | Comma-separated AD object classes this template applies permissions to |
-| `Template` | `array` | Array of permission rules |
-| `Template[].ObjectType` | `string` | AD object class (e.g. `user`, `group`, `computer`, `SCOPE`) |
-| `Template[].Property` | `string` | Property or extended right name (`@` = all properties) |
-| `Template[].Right` | `string` | Full `ActiveDirectoryRights` enum name(s) |
-
-### Merge behavior
-- Files are loaded alphabetically.
-- Duplicate IDs across files: last-writer-wins (the later file overrides).
-- Invalid templates are skipped with a warning — remaining templates still load.
+> v1.3 Rights enum migration (abbreviations → full names): see [`templates/README.md`](templates/README.md#v13--rights-enum-migration)
 
 ---
 
-## ⚠️ Breaking change in v1.3-dev — Rights format
-
-**Before (v1.2):** Templates used abbreviations like `RP`, `WP`, `CC`, `CONTROLRIGHT`.  
-**Now (v1.3-dev):** Templates must use the full `System.DirectoryServices.ActiveDirectoryRights` enum names.
-
-| Old abbreviation | New full name |
-|---|---|
-| `RP` | `ReadProperty` |
-| `WP` | `WriteProperty` |
-| `CC` | `CreateChild` |
-| `DC` | `DeleteChild` |
-| `SD` | `Self` |
-| `WD` | `WriteDacl` |
-| `CONTROLRIGHT` | `ExtendedRight` |
-| `GA` | `GenericAll` |
-| `GR` | `GenericRead` |
-| `GW` | `GenericWrite` |
-| `GE` | `GenericExecute` |
-| `LC` | `ListChildren` |
-
-**Multiple rights per rule** are supported — separate with `|` or `,`:
-```json
-{ "ObjectType": "user", "Property": "@", "Right": "ReadProperty|WriteProperty" }
-```
-
-> Validation is case-insensitive. Invalid `Right` values produce a clear warning listing all allowed enum names.
-
----
-
-## 🔧 Troubleshooting
-
-| Problem | Solution |
-|---|---|
-| Template is skipped | Check the warning message — it tells you whether `Right`, `ObjectType`, or `Property` is invalid |
-| JSON parse error | Validate syntax: `Get-Content .\templates\100-user.json -Raw \| ConvertFrom-Json` |
-| "No template with ID X found" | Run `-ShowTemplates` to verify the ID exists and is loaded |
-| "Template path not found" | Verify `-TemplatePath` points to an existing file or directory |
-| Old abbreviations rejected | Replace abbreviations with full enum names (see migration table above) |
-
----
-
-## 🔗 Related scripts
-
-| Script | Purpose |
-|---|---|
-| `Revert-ADDelegationTemplate.ps1` | Revert previously applied permissions using a log file |
-| `Show-ADDelegationTemplateChanges.ps1` | Display logged permission changes (formatted or raw) |
-| `tools\ConvertFrom-DelegwizToTemplate.ps1` | Convert legacy `delegwiz.ini` files to JSON templates |
-| `tools\ConvertFrom-ObjectAclToTemplate.ps1` | Reverse-engineer: generate a template from existing AD permissions |
-| `tools\Test-DelegationTemplate.ps1` | Validate a JSON template against the AD schema |
-
----
-
-## 💬 Community
+##  Community
 
 Suggestions, bug reports, and contributions are welcome!  
 Please open an issue or submit a pull request with a clear explanation.

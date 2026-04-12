@@ -1,78 +1,144 @@
-# Delegation templates (JSON) — Quick start & reference
+# Delegation Templates — JSON Format & Reference
 
-## 🚀 Quick start
+> **Matches:** v1.4-prod &nbsp;|&nbsp; **Updated:** 2026-04
 
-**1. List available templates (with details):**
-```powershell
-Invoke-ADDelegationTemplate -TemplatePath .\templates -ShowTemplates -IncludeDetails
-```
+---
 
-**2. Apply template ID 101 to an OU:**
-```powershell
-Invoke-ADDelegationTemplate -AdIdentity 'CN=UserManagers,OU=Groups,DC=contoso,DC=local' -AdObjectPathDN 'OU=MyOU,DC=contoso,DC=local' -TemplateIDs 101 -TemplatePath .\templates
-```
+## JSON schema
 
-**3. Apply multiple templates at once:**
-```powershell
-Invoke-ADDelegationTemplate -AdIdentity 'CN=Helpdesk,OU=Groups,DC=contoso,DC=local' -AdObjectPathDN 'OU=MyOU,DC=contoso,DC=local' -TemplateIDs 101,200,300 -TemplatePath .\templates
-```
+Each file is a JSON array of template objects:
 
-## 📝 Format
-- Top-level: JSON array of template objects.
-- Template object keys: ID (string), Description (string), AppliesToClasses (CSV string), ObjectTypes (CSV string), Template (array of rules).
-- Rule keys: ObjectType (string), Property (string), Right (string).
-
-## ⚠️ Right values (IMPORTANT — breaking change)
-- Use the full System.DirectoryServices.ActiveDirectoryRights enum names (e.g. ReadProperty, WriteProperty, ExtendedRight).
-- Abbreviations (e.g. RP, WP, CONTROLRIGHT) are no longer supported.
-- Multiple rights per rule are allowed; use `|` or `,` (e.g. "ReadProperty|WriteProperty").
-- Validation is case‑insensitive.
-
-## 💡 Minimal example
 ```json
 [
   {
-    "ID": "101",
+    "ID": "100",
+    "Category": "Account Lifecycle",
     "AppliesToClasses": "domainDNS,organizationalUnit,container",
-    "Description": "Create and manage user accounts",
+    "Description": "Create, delete, and manage user accounts",
     "ObjectTypes": "SCOPE,user",
     "Template": [
       { "ObjectType": "SCOPE", "Property": "user", "Right": "CreateChild" },
-      { "ObjectType": "user", "Property": "@", "Right": "ReadProperty|WriteProperty" },
-      { "ObjectType": "user", "Property": "Reset Password", "Right": "ExtendedRight" }
+      { "ObjectType": "SCOPE", "Property": "user", "Right": "DeleteChild" },
+      { "ObjectType": "user",  "Property": "@",    "Right": "ReadProperty" },
+      { "ObjectType": "user",  "Property": "@",    "Right": "WriteProperty" }
+    ]
+  },
+  {
+    "ID": "101",
+    "Category": "Account Lifecycle",
+    "ObjectClass": "User",
+    "AppliesToClasses": "domainDNS,organizationalUnit,container",
+    "Description": "Create a user account in disabled state",
+    "ObjectTypes": "SCOPE",
+    "Template": [
+      { "ObjectType": "SCOPE", "Property": "user", "Right": "CreateChild" }
     ]
   }
 ]
 ```
 
-## ⚙️ Behavior & rules
-- Provide either a single JSON file or a directory of JSON files.
-- Files are read alphabetically; on duplicate IDs the later file wins (last‑writer‑wins).
-- Invalid templates are skipped and a warning is emitted.
-- `-TemplatePath` is required — the cmdlet contains no built‑in templates.
+| Key | Type | Required | Description |
+|---|---|---|---|
+| `ID` | `string` | yes | Unique numeric identifier (e.g. `"100"`) |
+| `Category` | `string` | yes | Grouping for `-ShowTemplates` output (see [Categories per file](#categories-per-file)) |
+| `ObjectClass` | `string` | no | Display name for `-ShowTemplates` grouping (e.g. `User`, `Group`, `Computer`). If omitted, derived from `ObjectTypes`. |
+| `AppliesToClasses` | `string` | yes | Comma-separated AD classes this template targets (e.g. `domainDNS,organizationalUnit,container`) |
+| `Description` | `string` | yes | Human-readable label |
+| `ObjectTypes` | `string` | yes | Comma-separated AD classes for ACE inheritance; `SCOPE` = container-level rule |
+| `Template[]` | `array` | yes | Permission rules — **one right per rule** (see below) |
 
-## 🔄 Migration hints (short mapping)
-- RP  → ReadProperty
-- WP  → WriteProperty
-- CC  → CreateChild
-- DC  → DeleteChild
-- SD  → Self
-- WD  → WriteDacl
-- CONTROLRIGHT → ExtendedRight
-- GA/GE/GR/GW → GenericAll / GenericExecute / GenericRead / GenericWrite
+### Rule keys (`Template[]`)
 
-## 🔧 Troubleshooting
-- **JSON syntax check:** 
-  ```powershell
-  Get-Content .\templates\100-user.json -Raw | ConvertFrom-Json
-  ```
-- **Show templates with source file:** 
-  ```powershell
-  Invoke-ADDelegationTemplate -TemplatePath .\templates -ShowTemplates -IncludeDetails
-  ```
-- Invalid `Right` values will be rejected with a clear warning listing allowed enum names.
+| Key | Type | Description |
+|---|---|---|
+| `ObjectType` | `string` | AD object class (e.g. `user`, `group`, `computer`) or `SCOPE` for container-level |
+| `Property` | `string` | AD attribute, extended right, or `@` (= all properties) |
+| `Right` | `string` | **Single** `ActiveDirectoryRights` enum name (e.g. `ReadProperty`, `WriteProperty`) |
 
-## 📌 Notes
-- This README matches v1.3‑dev behaviour: templates must use full enum names and may specify multiple rights per rule.
-- Update your external JSON templates before upgrading to v1.3 if they still use abbreviations.
+> **Convention:** Each right gets its own rule entry. Use separate rules instead of combining rights with `|`.
+
+---
+
+## Allowed Right values
+
+Use the full `System.DirectoryServices.ActiveDirectoryRights` enum names. Validation is case-insensitive.
+
+| Enum name | Typical use |
+|---|---|
+| `ReadProperty` | Read a specific attribute |
+| `WriteProperty` | Write a specific attribute |
+| `CreateChild` | Create child objects of a type |
+| `DeleteChild` | Delete child objects of a type |
+| `Delete` | Delete the object itself |
+| `Self` | Validated writes (e.g. add/remove self from group) |
+| `WriteDacl` | Modify the object's ACL |
+| `ExtendedRight` | Extended rights (Reset Password, Change Password, …) |
+| `GenericAll` | Full control — **avoid in production** |
+| `GenericRead` | Read all properties + list |
+| `GenericWrite` | Write all properties |
+| `GenericExecute` | Read permissions + list children |
+| `ListChildren` | List child objects |
+
+The script also accepts `|` or `,` separated rights (e.g. `"ReadProperty|WriteProperty"`), but the shipped templates use **one right per rule** for clarity.
+
+---
+
+## Merge & load behavior
+
+- Provide a single `.json` file or a directory via `-TemplatePath`.
+- Files are loaded **alphabetically** — on duplicate IDs the later file wins (last-writer-wins).
+- Invalid templates are skipped with a warning; remaining templates still load.
+- If `-TemplatePath` is omitted, the script auto-loads from `templates\` next to the script.
+
+---
+
+## Categories per file
+
+| File | Templates | Categories |
+|---|---|---|
+| `100-user.json` | 53 | Account Lifecycle, Account, General, Password, Security |
+| `200-group.json` | 15 | Account Lifecycle, General, Membership |
+| `300-computer.json` | 13 | Account Lifecycle, General, Security |
+| `400-organizationalUnit.json` | 7 | Account Lifecycle, General, Security |
+| `500-groupPolicy.json` | 3 | Group Policy |
+| `600-wmi.json` | 1 | Account Lifecycle |
+| `700-inetOrgPerson.json` | 3 | Account Lifecycle, General, Password |
+
+---
+
+## Breaking changes (template-specific)
+
+### v1.4 — Least-privilege & Category
+
+- **`GenericAll` replaced.** Templates `100`, `200`, `300`, `600`, `700` now use granular rights instead of `GenericAll`.
+- **`Category` field required.** Every template must include a `Category` string.
+- **ID renumbering.** User: `100`–`152` (53 templates), Group: `200`–`214` (15), Computer: `300`–`312` (13). Run `-ShowTemplates` to verify.
+
+### v1.3 — Rights enum migration
+
+Templates must use full enum names. Old abbreviations no longer work:
+
+| Old | New | | Old | New |
+|---|---|---|---|---|
+| `RP` | `ReadProperty` | | `WD` | `WriteDacl` |
+| `WP` | `WriteProperty` | | `CONTROLRIGHT` | `ExtendedRight` |
+| `CC` | `CreateChild` | | `GA` | `GenericAll` |
+| `DC` | `DeleteChild` | | `GR` | `GenericRead` |
+| `SD` | `Self` | | `GW` | `GenericWrite` |
+| `LC` | `ListChildren` | | `GE` | `GenericExecute` |
+
+---
+
+## Troubleshooting
+
+```powershell
+# Validate JSON syntax
+Get-Content .\templates\100-user.json -Raw | ConvertFrom-Json
+
+# List all templates with details and source file
+.\Invoke-ADDelegationTemplate.ps1 -ShowTemplates -IncludeDetails -TemplatePath .\templates
+```
+
+- Invalid `Right` values are rejected with a warning listing all allowed enum names.
+- Missing `Category` results in ungrouped display in `-ShowTemplates`.
 
